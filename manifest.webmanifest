@@ -1,8 +1,8 @@
 {
-  "name": "重庆 10.5-10.11 旅行册",
+  "name": "重庆 10.5-10.10 旅行册",
   "short_name": "重庆旅行册",
   "lang": "zh-CN",
-  "start_url": "./chongqing-trip-plans.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f7f2ea",
