@@ -1,0 +1,1629 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>重庆 10.5-10.11 三套旅行计划</title>
+<meta name="theme-color" content="#9a4b28">
+<meta name="description" content="重庆 10.5-10.11 杨家坪为基地的三套可切换旅行计划">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<style>
+:root { color-scheme: light; --background:#f7f2ea; --foreground:#241f1a; --card:#fffaf2; --card-foreground:#241f1a; --popover:#fffaf2; --popover-foreground:#241f1a; --primary:#9a4b28; --primary-foreground:#fffaf2; --secondary:#efe2d1; --secondary-foreground:#241f1a; --muted:#eadfce; --muted-foreground:#6d6258; --accent:#d7e1d2; --accent-foreground:#241f1a; --destructive:#b3261e; --border:#d9c8b4; --input:#d9c8b4; --ring:#9a4b28; --blue:#2f6f8f; --orange:#c66a30; --green:#4f7d57; --red:#b3261e; --purple:#77529b; --yellow:#c4942f; }
+body { margin:0; padding:24px; background: radial-gradient(circle at top left, rgba(198,106,48,.14), transparent 32%), var(--background); color:var(--foreground); }
+@media (max-width: 640px) { body { padding:12px; } }
+</style>
+</head>
+<body><div id="cq-trip-planner" class="cq-trip-planner">
+  <style>
+    #cq-trip-planner {
+      --cq-surface: color-mix(in srgb, var(--card) 92%, transparent);
+      --cq-soft: color-mix(in srgb, var(--muted) 68%, transparent);
+      --cq-line: color-mix(in srgb, var(--border) 76%, transparent);
+      --cq-accent: var(--blue);
+      --cq-warm: var(--orange);
+      --cq-green: var(--green);
+      color: var(--foreground);
+      font-family: ui-sans-serif, system-ui, sans-serif;
+    }
+    #cq-trip-planner * { box-sizing: border-box; }
+    #cq-trip-planner .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+      gap: 14px;
+      align-items: stretch;
+      margin-bottom: 14px;
+    }
+    #cq-trip-planner .hero-main {
+      padding: 18px;
+      background:
+        radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--cq-warm) 20%, transparent), transparent 34%),
+        radial-gradient(circle at 88% 8%, color-mix(in srgb, var(--cq-accent) 18%, transparent), transparent 36%),
+        linear-gradient(135deg, color-mix(in srgb, var(--card) 84%, transparent), color-mix(in srgb, var(--muted) 42%, transparent));
+      border: 1px solid var(--cq-line);
+      border-radius: 18px;
+    }
+    #cq-trip-planner h1 {
+      margin: 0 0 8px;
+      font-size: clamp(22px, 4vw, 34px);
+      letter-spacing: -0.02em;
+    }
+    #cq-trip-planner h2, #cq-trip-planner h3 { margin: 0; }
+    #cq-trip-planner p { margin: 0; }
+    #cq-trip-planner .lead { color: var(--muted-foreground); max-width: 68ch; }
+    #cq-trip-planner .hero-side {
+      padding: 14px;
+      border: 1px solid var(--cq-line);
+      border-radius: 18px;
+      background: var(--cq-surface);
+    }
+    #cq-trip-planner .share-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    #cq-trip-planner .share-actions button {
+      border: 1px solid color-mix(in srgb, var(--primary) 55%, var(--border));
+      border-radius: 10px;
+      padding: 8px 11px;
+      background: var(--primary);
+      color: var(--primary-foreground);
+      cursor: pointer;
+      font: inherit;
+      font-size: 12px;
+    }
+    #cq-trip-planner .share-actions button[hidden] { display: none; }
+    #cq-trip-planner .share-status {
+      color: var(--muted-foreground);
+      font-size: 12px;
+    }
+    #cq-trip-planner .pill-row, #cq-trip-planner .controls, #cq-trip-planner .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    #cq-trip-planner .pill, #cq-trip-planner .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--muted) 54%, transparent);
+      color: var(--foreground);
+      font-size: 12px;
+      line-height: 1.2;
+    }
+    #cq-trip-planner .pill strong { font-weight: 500; }
+    #cq-trip-planner .tabs {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin: 12px 0 14px;
+    }
+    #cq-trip-planner .tab {
+      border: 1px solid var(--cq-line);
+      background: var(--cq-surface);
+      color: var(--foreground);
+      border-radius: 14px;
+      padding: 10px;
+      text-align: left;
+      cursor: pointer;
+      min-height: 72px;
+    }
+    #cq-trip-planner .tab[aria-selected="true"] {
+      background: color-mix(in srgb, var(--primary) 18%, var(--card));
+      border-color: color-mix(in srgb, var(--primary) 54%, var(--border));
+    }
+    #cq-trip-planner .tab b { display: block; font-weight: 500; margin-bottom: 4px; }
+    #cq-trip-planner .tab span { display: block; color: var(--muted-foreground); font-size: 12px; }
+    #cq-trip-planner .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.03fr) minmax(310px, 0.97fr);
+      gap: 14px;
+      align-items: start;
+    }
+    #cq-trip-planner .panel {
+      border: 1px solid var(--cq-line);
+      border-radius: 18px;
+      background: var(--cq-surface);
+      padding: 14px;
+    }
+    #cq-trip-planner .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+    #cq-trip-planner .metric {
+      padding: 10px;
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--muted) 36%, transparent);
+      min-height: 74px;
+    }
+    #cq-trip-planner .metric small { display: block; color: var(--muted-foreground); margin-bottom: 5px; }
+    #cq-trip-planner .metric b { font-weight: 500; }
+    #cq-trip-planner .day-buttons {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+      margin: 12px 0;
+    }
+    #cq-trip-planner .day-btn {
+      border: 1px solid var(--cq-line);
+      background: color-mix(in srgb, var(--card) 82%, transparent);
+      color: var(--foreground);
+      border-radius: 12px;
+      padding: 8px 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    #cq-trip-planner .day-btn[aria-pressed="true"] {
+      background: color-mix(in srgb, var(--primary) 18%, var(--card));
+      border-color: color-mix(in srgb, var(--primary) 52%, var(--border));
+    }
+    #cq-trip-planner .slot-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+      margin: 0 0 12px;
+    }
+    #cq-trip-planner .slot-btn {
+      border: 1px solid var(--cq-line);
+      background: color-mix(in srgb, var(--card) 82%, transparent);
+      color: var(--foreground);
+      border-radius: 12px;
+      padding: 9px 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    #cq-trip-planner .slot-btn[aria-pressed="true"] {
+      background: color-mix(in srgb, var(--primary) 18%, var(--card));
+      border-color: color-mix(in srgb, var(--primary) 52%, var(--border));
+    }
+    #cq-trip-planner .map-wrap {
+      position: relative;
+      min-height: 420px;
+      border: 1px solid var(--cq-line);
+      border-radius: 18px;
+      overflow: hidden;
+      background: color-mix(in srgb, var(--muted) 24%, transparent);
+    }
+    #cq-trip-planner .leaflet-map {
+      width: 100%;
+      height: 420px;
+      display: block;
+    }
+    #cq-trip-planner .leaflet-container { font: inherit; }
+    #cq-trip-planner .leaflet-control-attribution { font-size: 10px; }
+    #cq-trip-planner .map-config {
+      display: grid;
+      grid-template-columns: 132px minmax(0, 1fr) minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: end;
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid var(--cq-line);
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--muted) 26%, transparent);
+    }
+    #cq-trip-planner .map-config label { display: grid; gap: 4px; font-size: 11px; color: var(--muted-foreground); }
+    #cq-trip-planner .map-config input,
+    #cq-trip-planner .map-config select {
+      min-width: 0;
+      width: 100%;
+      padding: 8px 9px;
+      border: 1px solid var(--cq-line);
+      border-radius: 9px;
+      background: var(--card);
+      color: var(--foreground);
+      font: inherit;
+      font-size: 12px;
+    }
+    #cq-trip-planner .map-config button {
+      border: 1px solid color-mix(in srgb, var(--primary) 55%, var(--border));
+      border-radius: 9px;
+      padding: 8px 11px;
+      background: var(--primary);
+      color: var(--primary-foreground);
+      cursor: pointer;
+      font: inherit;
+      font-size: 12px;
+    }
+    #cq-trip-planner .map-config-note {
+      grid-column: 1 / -1;
+      color: var(--muted-foreground);
+      font-size: 11px;
+    }
+    #cq-trip-planner .day-detail-list { display: grid; gap: 10px; }
+    #cq-trip-planner .slot-detail {
+      margin-top: 12px;
+      border: 1px solid var(--cq-line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--muted) 24%, transparent);
+      padding: 13px;
+    }
+    #cq-trip-planner .slot-detail h3 { font-size: 16px; font-weight: 500; margin-bottom: 5px; }
+    #cq-trip-planner .slot-detail p { color: var(--muted-foreground); font-size: 13px; margin-top: 6px; }
+    #cq-trip-planner .slot-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+    #cq-trip-planner .slot-detail-item {
+      padding: 9px;
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--card) 62%, transparent);
+    }
+    #cq-trip-planner .slot-detail-item small { display: block; color: var(--muted-foreground); margin-bottom: 4px; }
+    #cq-trip-planner .slot-detail-item b { font-weight: 500; font-size: 13px; }
+    #cq-trip-planner .day-detail-list { display: grid; gap: 10px; }
+    #cq-trip-planner .day-detail {
+      border: 1px solid var(--cq-line);
+      border-radius: 15px;
+      background: color-mix(in srgb, var(--muted) 24%, transparent);
+      overflow: hidden;
+    }
+    #cq-trip-planner .day-detail-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 11px 7px;
+      background: color-mix(in srgb, var(--card) 64%, transparent);
+    }
+    #cq-trip-planner .day-detail-head b { font-weight: 500; }
+    #cq-trip-planner .day-detail-head small { color: var(--muted-foreground); }
+    #cq-trip-planner .day-detail-body { display: grid; gap: 8px; padding: 0 10px 10px; }
+    #cq-trip-planner .day-detail-copy { color: var(--muted-foreground); font-size: 12px; padding: 2px 0; }
+    #cq-trip-planner .detail-option {
+      display: grid;
+      grid-template-columns: 68px minmax(0, 1fr);
+      gap: 9px;
+      padding: 8px 0;
+      border-top: 1px solid var(--cq-line);
+    }
+    #cq-trip-planner .detail-option:first-child { border-top: 0; }
+    #cq-trip-planner .detail-option time { color: var(--muted-foreground); font-size: 11px; padding-top: 3px; }
+    #cq-trip-planner .detail-option b { font-weight: 500; font-size: 13px; }
+    #cq-trip-planner .detail-option p { color: var(--muted-foreground); font-size: 12px; margin-top: 3px; }
+    #cq-trip-planner .detail-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
+    #cq-trip-planner .detail-links a { font-size: 11px; }
+    #cq-trip-planner .map-fallback {
+      display: grid;
+      place-items: center;
+      min-height: 420px;
+      padding: 18px;
+      text-align: center;
+      color: var(--muted-foreground);
+    }
+    #cq-trip-planner .offline-route {
+      min-height: 420px;
+      padding: 20px;
+      background:
+        radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--blue) 18%, transparent), transparent 28%),
+        radial-gradient(circle at 82% 72%, color-mix(in srgb, var(--orange) 18%, transparent), transparent 30%),
+        color-mix(in srgb, var(--muted) 32%, transparent);
+    }
+    #cq-trip-planner .offline-route h3 { font-size: 16px; font-weight: 500; margin-bottom: 6px; }
+    #cq-trip-planner .offline-route p { color: var(--muted-foreground); font-size: 12px; margin-bottom: 16px; }
+    #cq-trip-planner .offline-route-nodes { display: grid; gap: 8px; }
+    #cq-trip-planner .offline-route-node {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      gap: 9px;
+      align-items: center;
+      padding: 9px 10px;
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--card) 84%, transparent);
+      border: 1px solid var(--cq-line);
+    }
+    #cq-trip-planner .offline-route-node i {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: var(--primary-foreground);
+      font-style: normal;
+      font-size: 11px;
+    }
+    #cq-trip-planner .offline-route-node b { font-weight: 500; font-size: 13px; }
+    #cq-trip-planner .offline-route-node a { display: block; color: var(--muted-foreground); font-size: 11px; margin-top: 2px; }
+    #cq-trip-planner .offline-route-arrow {
+      color: var(--cq-warm);
+      font-size: 16px;
+      line-height: 1;
+      margin-left: 8px;
+    }
+    #cq-trip-planner .map-note {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      max-width: calc(100% - 24px);
+      background: color-mix(in srgb, var(--card) 90%, transparent);
+      border: 1px solid var(--cq-line);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+    #cq-trip-planner .timeline {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    #cq-trip-planner .slot {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 10px;
+      padding: 10px;
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--muted) 30%, transparent);
+    }
+    #cq-trip-planner .slot time { color: var(--muted-foreground); font-size: 12px; }
+    #cq-trip-planner .slot b { font-weight: 500; }
+    #cq-trip-planner .slot p { color: var(--muted-foreground); margin-top: 3px; }
+    #cq-trip-planner .section-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    #cq-trip-planner .section-title small { color: var(--muted-foreground); }
+    #cq-trip-planner .cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    #cq-trip-planner .mini-card {
+      border: 1px solid var(--cq-line);
+      border-radius: 16px;
+      overflow: hidden;
+      background: color-mix(in srgb, var(--card) 90%, transparent);
+    }
+    #cq-trip-planner .thumb {
+      min-height: 92px;
+      position: relative;
+      overflow: hidden;
+      background: color-mix(in srgb, var(--muted) 62%, transparent);
+      border-bottom: 1px solid var(--cq-line);
+    }
+    #cq-trip-planner .thumb img {
+      width: 100%;
+      height: 126px;
+      display: block;
+      object-fit: cover;
+    }
+    #cq-trip-planner .thumb a {
+      display: block;
+      height: 126px;
+      color: inherit;
+      text-decoration: none;
+    }
+    #cq-trip-planner .thumb-fallback {
+      display: grid;
+      place-items: center;
+      height: 126px;
+      padding: 12px;
+      text-align: center;
+      color: var(--muted-foreground);
+      font-size: 12px;
+      background:
+        radial-gradient(circle at 22% 25%, color-mix(in srgb, var(--orange) 25%, transparent), transparent 28%),
+        radial-gradient(circle at 78% 28%, color-mix(in srgb, var(--blue) 22%, transparent), transparent 30%),
+        color-mix(in srgb, var(--muted) 60%, transparent);
+    }
+    #cq-trip-planner .thumb:after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 38px;
+      background: linear-gradient(transparent, rgba(0, 0, 0, .62));
+      pointer-events: none;
+    }
+    #cq-trip-planner .thumb-label {
+      position: absolute;
+      left: 9px;
+      bottom: 7px;
+      z-index: 1;
+      color: #fff;
+      font-size: 11px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, .45);
+    }
+    #cq-trip-planner .mini-card-body { padding: 10px; }
+    #cq-trip-planner .mini-card h3 { font-size: 15px; margin-bottom: 4px; font-weight: 500; }
+    #cq-trip-planner .mini-card p { color: var(--muted-foreground); font-size: 12px; margin-bottom: 7px; }
+    #cq-trip-planner .links { display: flex; flex-wrap: wrap; gap: 8px; }
+    #cq-trip-planner a {
+      color: var(--foreground);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    #cq-trip-planner .tiny-link { font-size: 12px; }
+    #cq-trip-planner .compare {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    #cq-trip-planner .compare th, #cq-trip-planner .compare td {
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--cq-line);
+      padding: 8px 6px;
+    }
+    #cq-trip-planner .compare th { color: var(--muted-foreground); font-weight: 500; }
+    #cq-trip-planner .source-list {
+      columns: 2;
+      column-gap: 22px;
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted-foreground);
+      font-size: 12px;
+    }
+    #cq-trip-planner .source-list li { break-inside: avoid; margin-bottom: 6px; }
+    #cq-trip-planner .footer-note {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--muted) 32%, transparent);
+      color: var(--muted-foreground);
+      font-size: 12px;
+    }
+    @media (max-width: 820px) {
+      #cq-trip-planner .hero,
+      #cq-trip-planner .layout { grid-template-columns: 1fr; }
+      #cq-trip-planner .tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #cq-trip-planner .cards { grid-template-columns: 1fr; }
+      #cq-trip-planner .summary-grid { grid-template-columns: 1fr; }
+      #cq-trip-planner .map-config { grid-template-columns: 1fr 1fr; }
+      #cq-trip-planner .map-config button { width: 100%; }
+      #cq-trip-planner .slot-detail-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) {
+      #cq-trip-planner .day-buttons { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      #cq-trip-planner .slot-buttons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #cq-trip-planner .slot { grid-template-columns: 1fr; }
+      #cq-trip-planner .source-list { columns: 1; }
+      #cq-trip-planner .map-config { grid-template-columns: 1fr; }
+      #cq-trip-planner .map-config-note { grid-column: auto; }
+      #cq-trip-planner .detail-option { grid-template-columns: 1fr; gap: 3px; }
+    }
+  </style>
+
+  <div class="hero">
+    <div class="hero-main">
+      <h1>重庆 10.5-10.11 三套旅行计划</h1>
+      <p class="lead">杨家坪已经确定为本次重庆行的主要住宿基地。三套方案的区别不再是住哪里，而是杨家坪住几晚、什么时候进入渝中或江北嘴，以及是否愿意为中心区夜景多承担一次换酒店。武隆安排在 10.6 或 10.7；如果当天降雨、车次或体力不合适，可以与相邻的城市日互换。</p>
+      <div class="pill-row" style="margin-top:12px">
+        <span class="pill"><strong>机票</strong> 海航深圳-重庆往返，出发早班优先</span>
+        <span class="pill"><strong>住宿</strong> 酒店，非民宿，双床含早优先</span>
+        <span class="pill"><strong>餐饮</strong> 小面、火锅、烧烤、江湖菜全覆盖</span>
+        <span class="pill"><strong>节奏</strong> 武隆不单独住，减少孤立搬家</span>
+      </div>
+    </div>
+    <div class="hero-side">
+      <h2>当前结论</h2>
+      <p class="lead" style="margin-top:8px">杨家坪确定后，真正值得比较的是三种节奏：B 把老重庆与渝中核心做完整，D 少搬一次并以江景收尾，E 全程不换酒店、换取最大弹性。10 月 5 日晚三套方案都预留给同学汇合、聚餐和夜景。</p>
+      <div class="summary-grid">
+        <div class="metric"><small>体验优先</small><b>B 老重庆</b></div>
+        <div class="metric"><small>省心</small><b>E 全程不换</b></div>
+        <div class="metric"><small>江景收尾</small><b>D 少搬家</b></div>
+      </div>
+      <div class="share-actions">
+        <button id="share-book" type="button">分享当前视图</button>
+        <button id="install-book" type="button" hidden>安装旅行册</button>
+        <span id="share-status" class="share-status" role="status" aria-live="polite"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="三套计划">
+    <button class="tab" id="tab-B" role="tab" aria-controls="plan-panel" aria-selected="true" type="button" data-plan="B"><b>B 老重庆</b><span>杨家坪 3 晚 + 较场口 3 晚</span></button>
+    <button class="tab" id="tab-D" role="tab" aria-controls="plan-panel" aria-selected="false" type="button" data-plan="D"><b>D 少搬家</b><span>杨家坪 4 晚 + 江北嘴 2 晚</span></button>
+    <button class="tab" id="tab-E" role="tab" aria-controls="plan-panel" aria-selected="false" type="button" data-plan="E"><b>E 不换酒店</b><span>全程杨家坪 6 晚</span></button>
+  </div>
+
+  <div id="plan-panel" role="tabpanel" aria-labelledby="tab-B" aria-live="polite">
+    <div class="layout">
+      <div class="panel">
+        <div class="section-title">
+          <h2 id="plan-title"></h2>
+          <small id="plan-fit"></small>
+        </div>
+        <p class="lead" id="plan-reason"></p>
+        <div class="summary-grid" id="plan-metrics"></div>
+        <div class="day-buttons" id="day-buttons" aria-label="选择日期"></div>
+        <div class="slot-buttons" id="slot-buttons" role="tablist" aria-label="选择时段"></div>
+        <div class="map-config" aria-label="地图设置">
+          <label>地图服务
+            <select id="map-provider">
+              <option value="amap">高德地图 API</option>
+              <option value="baidu">百度地图 API</option>
+              <option value="osm">OpenStreetMap（免 Key）</option>
+            </select>
+          </label>
+          <label id="amap-key-label">高德 Key
+            <input id="amap-key" type="password" autocomplete="off" placeholder="粘贴 JS API Key">
+          </label>
+          <label id="amap-security-label">高德 securityJsCode
+            <input id="amap-security" type="password" autocomplete="off" placeholder="可选，按高德控制台配置">
+          </label>
+          <label id="baidu-key-label" hidden>百度 AK
+            <input id="baidu-ak" type="password" autocomplete="off" placeholder="粘贴百度地图 JavaScript API AK">
+          </label>
+          <button id="map-init" type="button">加载地图</button>
+          <div class="map-config-note" id="map-config-note">地图 API 需要你自己的 Key；Key 只保存在本机浏览器 localStorage，不会写入计划文件。未配置时仍可点击地点链接打开高德/百度地图。</div>
+        </div>
+        <div class="map-wrap">
+          <div id="leaflet-map" class="leaflet-map" role="application" aria-label="重庆每日行程街道地图"></div>
+          <div class="map-note" id="map-note"></div>
+        </div>
+        <div class="slot-detail" id="slot-detail"></div>
+      </div>
+
+      <div class="panel">
+        <div class="section-title">
+          <h2>当前时段备选</h2>
+          <small id="slot-options-caption">随日期与时段切换</small>
+        </div>
+        <div class="day-detail-list" id="slot-options"></div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <div class="section-title">
+        <h2>三套方案横向比较</h2>
+        <small>用于快速收敛</small>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="compare" id="compare-table"></table>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <div class="section-title">
+        <h2>信源与交叉印证</h2>
+        <small>事实源优先级：官方 > 酒店/平台详情页 > UGC 趋势</small>
+      </div>
+      <ul class="source-list">
+        <li><a href="https://big5.www.gov.cn/gate/big5/www.gov.cn/zhengce/zhengceku/202511/content_7047091.htm" target="_blank" rel="noreferrer">国务院 2026 节假日安排</a>：确认 10.1-10.7 放假，10.10 补班。</li>
+        <li><a href="https://cqwl.gov.cn/bmjz_sites/bm/wlw/zwgk_98942/zfxxgkml/jczwgkzl/ggwhfwly/ggfw/ggwljgmd/202601/t20260104_15286062.html" target="_blank" rel="noreferrer">武隆区政府景区名录</a>：天生三桥、仙女山、芙蓉洞等 5A 信息与开放时间。</li>
+        <li><a href="https://admin.cq.gov.cn/ywdt/jrcq/202606/t20260628_15781808.html" target="_blank" rel="noreferrer">重庆市政府交通信息</a>：重庆东站与渝厦高铁相关交通背景。</li>
+        <li><a href="https://www.cq.gov.cn/zjcq/cycq/jplyxl/dsy/dsjp/202608/t20260826_15982331.html" target="_blank" rel="noreferrer">重庆中国三峡博物馆信息</a>：开放时间和核心定位。</li>
+        <li><a href="https://www.cq.gov.cn/zjcq/cycq/jplyxl/dsy/dsjp/202608/t20260826_15982338.html" target="_blank" rel="noreferrer">长江索道信息</a>：开放时间与小什字站位置。</li>
+        <li><a href="https://cqjlp.gov.cn/bmjz/qzfbm_97119/qwhlyw_97727/zwgk_97124/gkml/jczwgk/ggwhfwly/ggfw/ggwljgml/202608/t20260807_15904141.html" target="_blank" rel="noreferrer">九龙坡区重庆动物园名录</a>：动物园位置、票价、开放信息。</li>
+        <li><a href="https://www.cqyz.gov.cn/zjyz/lyyz/rmdkd/202202/t20220215_10397629.html" target="_blank" rel="noreferrer">渝中区山城巷介绍</a>：山城巷历史街区与步道风貌。</li>
+        <li><a href="https://www.cqna.gov.cn/jz/tyjjd/sy/dt_59966/202503/t20250317_14411210.html" target="_blank" rel="noreferrer">南岸区龙门浩信息</a>：龙门浩历史文化街区。</li>
+        <li><a href="https://hotels.ctrip.com/hotels/4614140.html" target="_blank" rel="noreferrer">携程：重庆锦怡豪生酒店</a>：杨家坪/动物园地铁站、山景、早餐、评分。</li>
+        <li><a href="https://hotels.ctrip.com/hotels/130932564.html" target="_blank" rel="noreferrer">携程：大礼堂嘉陵江滨江路亚朵</a>：江景、早餐、近三峡博物馆。</li>
+        <li><a href="https://hotels.ctrip.com/hotels/132915536.html" target="_blank" rel="noreferrer">携程：江北嘴金融街亚朵</a>：江景、早餐、江北嘴位置。</li>
+        <li><a href="https://hotels.corporatetravel.ctrip.com/hotels/51725373.html" target="_blank" rel="noreferrer">携程：南滨路皇冠国际江景亚朵</a>：江景、早餐、南滨路位置。</li>
+        <li><a href="https://you.ctrip.com/food/158/5417770.html" target="_blank" rel="noreferrer">携程美食：哈儿土火锅南兴路店</a>：南坪社区火锅候选。</li>
+        <li><a href="https://gs.ctrip.com/html5/you/foods/fooddetail/158/15488218.html" target="_blank" rel="noreferrer">携程美食：印象渝都杨家坪店</a>：杨家坪火锅候选。</li>
+        <li><a href="https://you.ctrip.com/fooditem/chongqing158/7756020-p1.html" target="_blank" rel="noreferrer">携程美食：重庆火锅条目</a>：仪表厂火锅、天棒老火锅、香老坎等候选。</li>
+        <li><a href="https://touch.travel.qunar.com/poi/11544032" target="_blank" rel="noreferrer">去哪儿：胡记蹄花汤</a>：黄桷坪蹄花汤候选。</li>
+        <li><a href="https://www.xiaohongshu.com/search_result?keyword=%E9%87%8D%E5%BA%86%20%E5%B1%B1%E5%9F%8E%E5%B7%B7%20%E5%8D%81%E5%85%AB%E6%A2%AF%20%E7%99%BD%E8%B1%A1%E5%B1%85%20%E6%8B%8D%E7%85%A7" target="_blank" rel="noreferrer">小红书检索：山城巷/十八梯/白象居拍照</a>：仅作路线热度与拍照体验交叉印证。</li>
+        <li><a href="https://www.xiaohongshu.com/search_result?keyword=%E9%87%8D%E5%BA%86%20%E9%BB%84%E6%A1%B7%E5%9D%AA%20%E4%BA%A4%E9%80%9A%E8%8C%B6%E9%A6%86%20%E6%94%BB%E7%95%A5" target="_blank" rel="noreferrer">小红书检索：黄桷坪/交通茶馆</a>：仅作老重庆生活线交叉印证。</li>
+        <li><a href="https://www.xiaohongshu.com/search_result?keyword=%E9%87%8D%E5%BA%86%20%E6%AD%A6%E9%9A%86%20%E5%A4%A9%E7%94%9F%E4%B8%89%E6%A1%A5%20%E4%B8%80%E6%97%A5%E6%B8%B8" target="_blank" rel="noreferrer">小红书检索：武隆天生三桥一日游</a>：仅作体力与时间体验交叉印证。</li>
+        <li><a href="https://www.amap.com/search?query=43%E5%8F%B7%E9%9D%A2%E6%91%8A&city=%E9%87%8D%E5%BA%86%E5%B8%82" target="_blank" rel="noreferrer">高德检索：43 号面摊</a>：南岸南坪烟雨堡小区附近，作为南岸线早餐/宵夜候选。</li>
+        <li><a href="https://www.amap.com/search?query=%E4%B9%9D%E9%BE%99%E5%9D%A1%E5%8C%BA%E8%81%94%E9%98%B2%E9%A3%9F%E5%BA%97%E5%AE%B6%E5%B8%B8%E8%8F%9C&city=%E9%87%8D%E5%BA%86%E5%B8%82" target="_blank" rel="noreferrer">高德检索：联防食店家常菜</a>：九龙坡铁路一村，适合杨家坪/黄桷坪午餐。</li>
+        <li><a href="https://www.amap.com/search?query=%E8%B7%AF%E6%B5%8E%E4%BA%9A%E8%B1%86%E8%8A%B1%E9%A4%A8&city=%E9%87%8D%E5%BA%86%E5%B8%82" target="_blank" rel="noreferrer">高德检索：路济亚豆花馆</a>：花卉园金龙路 121 附 18，适合江北北线。</li>
+        <li><a href="https://www.amap.com/search?query=%E6%AD%AA%E5%93%A5%E6%88%98%E5%8F%8B%E7%89%9B%E8%82%89%E9%9D%A2&city=%E9%87%8D%E5%BA%86%E5%B8%82" target="_blank" rel="noreferrer">高德检索：歪哥战友牛肉面</a>：公开地址尚未能可靠交叉核实，订行程前必须二次确认。</li>
+        <li><a href="https://lbs.amap.com/api/javascript-api-v2/prerequisites" target="_blank" rel="noreferrer">高德 JS API 2.0 准备文档</a>：确认 Web 端 Key 和安全密钥要求。</li>
+        <li><a href="https://lbs.amap.com/api/javascript-api-v2/guide/abc/jscode" target="_blank" rel="noreferrer">高德 JS API 安全密钥文档</a>：确认 securityJsCode 使用方式与安全提醒。</li>
+        <li><a href="https://lbsyun.baidu.com/docs/jsapi?title=jspopularGL%2Findex" target="_blank" rel="noreferrer">百度地图 JavaScript API GL 文档</a>：确认浏览器 AK、缩放、覆盖物和路线能力。</li>
+        <li><a href="https://lbsyun.baidu.com/index.php?title=jspopular%2Fguide%2Fintroduction" target="_blank" rel="noreferrer">百度地图坐标转换说明</a>：提醒百度使用 BD-09，页面中的百度点位为片区级参考。</li>
+      </ul>
+      <div class="footer-note">价格提醒：当前酒店预算按“目标 500 元/晚以内”规划；10.5-10.7 仍处国庆假期，含早双床和江景房可能临时上浮。订房前应以携程/Trip 实时可取消价为准。</div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const root = document.getElementById('cq-trip-planner');
+      const points = {
+        airport: ['江北机场', 29.719, 106.641],
+        east: ['重庆东站', 29.486, 106.570],
+        wulong: ['武隆南/天生三桥', 29.405, 107.755],
+        nanping: ['南坪', 29.535, 106.574],
+        longmenhao: ['龙门浩/南滨路', 29.548, 106.591],
+        yangjiaping: ['杨家坪/动物园', 29.501, 106.512],
+        huangjueping: ['黄桷坪/交通茶馆', 29.484, 106.511],
+        daping: ['大坪', 29.542, 106.510],
+        lianglukou: ['两路口/上清寺', 29.552, 106.539],
+        eling: ['鹅岭/李子坝', 29.548, 106.524],
+        jiefangbei: ['解放碑/较场口', 29.563, 106.577],
+        shancheng: ['山城巷/十八梯', 29.559, 106.570],
+        chaotianmen: ['朝天门/来福士', 29.565, 106.586],
+        jiangbeizui: ['江北嘴', 29.576, 106.580],
+        lijia: ['礼嘉/光环', 29.633, 106.507],
+        guanyinqiao: ['观音桥/北仓', 29.584, 106.533],
+        museum: ['三峡博物馆/大礼堂', 29.560, 106.544],
+        nanshan: ['南山/夜景', 29.540, 106.590]
+      };
+
+      const links = {
+        ctripHotel: 'https://hotels.ctrip.com',
+        wulong: 'https://cqwl.gov.cn/bmjz_sites/bm/wlw/zwgk_98942/zfxxgkml/jczwgkzl/ggwhfwly/ggfw/ggwljgmd/202601/t20260104_15286062.html',
+        ctripFoodHotpot: 'https://you.ctrip.com/fooditem/chongqing158/7756020-p1.html',
+        xhsCenter: 'https://www.xiaohongshu.com/search_result?keyword=%E9%87%8D%E5%BA%86%20%E5%B1%B1%E5%9F%8E%E5%B7%B7%20%E5%8D%81%E5%85%AB%E6%A2%AF%20%E7%99%BD%E8%B1%A1%E5%B1%85%20%E6%8B%8D%E7%85%A7',
+        xhsOld: 'https://www.xiaohongshu.com/search_result?keyword=%E9%87%8D%E5%BA%86%20%E9%BB%84%E6%A1%B7%E5%9D%AA%20%E4%BA%A4%E9%80%9A%E8%8C%B6%E9%A6%86%20%E6%94%BB%E7%95%A5'
+      };
+
+      const hotels = {
+        nanping: [
+          ['南坪国际会展中心步行街亚朵', '先按每晚 500 元以内筛选，优先双床和含早餐房型。酒店靠近南坪商圈与轨道交通，适合连续住三到六晚。', 'https://hotels.ctrip.com/hotels/71514584.html', '酒店'],
+          ['南滨路皇冠国际江景亚朵', '如果更看重江景和早餐，可以把它作为南岸升级备选。国庆前段及江景房可能超预算，建议只订可取消房并持续比价。', 'https://hotels.corporatetravel.ctrip.com/hotels/51725373.html', '江景'],
+          ['重庆富力艾美酒店', '这是预算放宽后的五星升级选项，位置成熟、服务稳定，但通常不作为 500 元以内的主方案。', 'https://hotels.ctrip.com/hotels/396484.html', '升级']
+        ],
+        yangDaping: [
+          ['重庆锦怡豪生酒店', '这是杨家坪/动物园线的首选观察对象，重点查看山景、双床、早餐和实际到地铁站的步行距离。', 'https://hotels.ctrip.com/hotels/4614140.html', '酒店'],
+          ['重庆新天地大坪亚朵', '酒店位于大坪/化龙桥方向，去黄桷坪和渝中西侧都比较容易，适合把老重庆与中心区接在同一段行程里。', 'https://hotels.ctrip.com/hotels/72991337.html', '酒店'],
+          ['杨家坪亚朵/欢朋类', '如果锦怡豪生超过预算，就在同一片区改看高评分商务酒店，优先保留双床、含早和近轨道交通三个条件。', links.ctripHotel, '备选']
+        ],
+        center: [
+          ['大礼堂嘉陵江滨江路亚朵', '适合需要中心西侧住宿的临时备选：靠近三峡博物馆、大礼堂和嘉陵江步道，先核对双床房的实时价格。', 'https://hotels.ctrip.com/hotels/130932564.html', '江景'],
+          ['重庆希尔顿酒店两路口', '这是交通最强的传统五星升级选项，适合把酒店舒适度放在预算之前考虑，通常需要接受价格波动。', 'https://hotels.ctrip.com/hotels/425572.html', '升级'],
+          ['雾都宾馆', '位于上清寺/曾家岩一带，处在中心边缘，适合早晚散步，也能减少住进解放碑核心区后的游客密度。', 'https://hotels.ctrip.com/hotels/1214343.html', '酒店']
+        ],
+        jiefangbei: [
+          ['解放碑国贸中心亚朵', '10 月 8 日以后再重点看价格，位置可以步行覆盖十八梯、较场口和洪崖洞外围。适合想把中心区集中走完的人。', 'https://hotels.ctrip.com/hotels/127689059.html', '酒店'],
+          ['解放碑魁星楼亚朵', '更适合把 8D 城市感和夜间拍照放在住宿门口完成，但需要接受核心区人流与价格可能偏高。', 'https://m.ctrip.com/webapp/hotel/chongqing4/h631?seoRedirect=1', '酒店'],
+          ['重庆解放碑威斯汀', '这是中心区的预算升级项，地段和酒店品质都强，但游客密度最高，不作为本次“避开网红城区”的首选。', 'https://hotels.ctrip.com/hotels/853869.html', '升级']
+        ],
+        jiangbei: [
+          ['江北嘴金融街亚朵', '这是江北嘴段的预算主力，兼顾江景、早餐和相对安静的夜间环境，适合把最后两晚做成收尾段。', 'https://hotels.ctrip.com/hotels/132915536.html', '江景'],
+          ['江北嘴鎏嘉码头亚朵S', '如果一线江景比预算更重要，可以关注这类房型；价格可能超过 500 元，必须以可取消价为准。', 'https://hotels.ctrip.com/hotels/130636605.html', '江景'],
+          ['来福士广场江景亚朵', '靠近朝天门和小什字，城市景观与夜间步行很方便，但房价波动较大，适合作为监控项而非唯一选择。', 'https://hotels.corporatetravel.ctrip.com/hotels/744324.html', '江景']
+        ],
+        lijia: [
+          ['两江新区金科中心亚朵', '礼嘉段的预算主力，靠近光环和重光站，适合把前几晚安排得安静、规律，但去武隆仍需额外早起。', 'https://hotels.ctrip.com/hotels/108825006.html', '酒店'],
+          ['重庆金科大酒店', '这是礼嘉片区的舒适升级项，预算内出现合适价格的概率较低，但可以在非高峰房价里持续监控。', 'https://hotels.ctrip.com/hotels/80285808.html', '升级'],
+          ['江北机场回兴轻轨站亚朵', '如果返程航班特别早，可以把它作为最后一晚的功能型备选；它不适合承担完整的城市观光基地。', 'https://hotels.ctrip.com/hotels/70305949.html', '机场']
+        ]
+      };
+
+      const foods = {
+        south: [
+          ['南坪小面/豌杂面', '适合 7:30-9:00 在住宿区附近解决早餐。优先选择本地人正常排队的店，不为了吃一碗小面跨城。', 'https://www.xiaohongshu.com/search_result?keyword=%E5%8D%97%E5%9D%AA%20%E5%B0%8F%E9%9D%A2%20%E9%87%8D%E5%BA%86', '小面'],
+          ['43号面摊', '位于南岸南坪烟雨堡小区附近，可以放在南岸线早餐或晚间加餐里。公开信息对营业时间不完全一致，出发当天要再确认。', 'https://www.xiaohongshu.com/search_result?keyword=43%E5%8F%B7%E9%9D%A2%E6%91%8A%20%E9%87%8D%E5%BA%86', '指定'],
+          ['哈儿土火锅南兴路店', '携程条目显示为南坪社区火锅候选，人均约 50 元。它更适合第一晚就近吃，饭后回住宿区休息。', 'https://you.ctrip.com/food/158/5417770.html', '火锅'],
+          ['邓记莽子老火锅南坪店', '去哪儿有公开条目，可作为南坪段的地道火锅备选。是否安排取决于当天排队、辣度和前一顿的分量。', 'https://touch.travel.qunar.com/poi/7607160', '火锅'],
+          ['南坪烧烤/烤脑花', '适合 21:00 后作为轻量宵夜，优先看烤苕皮、烤豆干和烤脑花，避免与火锅安排在同一晚。', 'https://gs.ctrip.com/html5/you/foods/fooddetail/158/5419848.html', '烧烤']
+        ],
+        old: [
+          ['杨家坪小面/抄手', '适合在动物园、杨家坪步行街或 2 号线沿线解决早餐，先用一顿简单主食开启老城区的一天。', 'https://www.xiaohongshu.com/search_result?keyword=%E6%9D%A8%E5%AE%B6%E5%9D%AA%20%E5%B0%8F%E9%9D%A2', '小面'],
+          ['歪哥战友牛肉面', '这是指定餐厅，但目前还没有找到能够交叉确认的公开地址。暂时作为待核验早餐保留，不把它写成必须绕行的精确路线点。', 'https://www.amap.com/search?query=%E6%AD%AA%E5%93%A5%E6%88%98%E5%8F%8B%E7%89%9B%E8%82%89%E9%9D%A2&city=%E9%87%8D%E5%BA%86%E5%B8%82', '指定'],
+          ['印象渝都杨家坪店', '携程条目显示其靠近杨家坪步行街，可以作为老重庆日的火锅候选。若排队时间过长，就近换社区店。', 'https://gs.ctrip.com/html5/you/foods/fooddetail/158/15488218.html', '火锅'],
+          ['九龙坡区联防食店家常菜', '位于九龙坡铁路一村，更适合杨家坪/黄桷坪日的午餐。它的价值是家常菜和居民区氛围，不是景区打卡餐厅。', 'https://www.amap.com/search?query=%E4%B9%9D%E9%BE%99%E5%9D%A1%E5%8C%BA%E8%81%94%E9%98%B2%E9%A3%9F%E5%BA%97%E5%AE%B6%E5%B8%B8%E8%8F%9C&city=%E9%87%8D%E5%BA%86%E5%B8%82', '指定'],
+          ['黄桷坪蹄花汤/豆花饭', '更适合放在黄桷坪慢线的午餐位置，与交通茶馆、川美老校区顺路，也能避免连续两顿重辣火锅。', 'https://touch.travel.qunar.com/poi/11544032', '特色'],
+          ['路济亚豆花馆', '花卉园金龙路 121 附 18；适合观音桥/北仓半日或北线补充，不建议为它从南岸专程折返。', 'https://www.amap.com/search?query=%E8%B7%AF%E6%B5%8E%E4%BA%9A%E8%B1%86%E8%8A%B1%E9%A4%A8&city=%E9%87%8D%E5%BA%86%E5%B8%82', '指定'],
+          ['黄桷坪江湖菜', '可以从辣子鸡、毛血旺、酸汤兔、黔江鸡杂等方向选择，重点是找老社区支路店，不追逐中心区网红门店。', 'https://www.xiaohongshu.com/search_result?keyword=%E9%BB%84%E6%A1%B7%E5%9D%AA%20%E6%B1%9F%E6%B9%96%E8%8F%9C', '江湖菜']
+        ],
+        meetup: [
+          ['杨家坪社区火锅/串串', '首晚同学都方便到九龙坡时的第一选择。以杨家坪步行街、谢家湾一带可订位或能正常排队的社区火锅、串串为准；印象渝都可作候选，但不把某一家店设为硬任务。', 'https://www.amap.com/search?query=%E6%9D%A8%E5%AE%B6%E5%9D%AA%20%E7%81%AB%E9%94%85&city=%E9%87%8D%E5%BA%86%E5%B8%82', '首晚优先'],
+          ['杨家坪江湖菜/家常菜', '不想第一餐就吃重辣火锅时，选择适合多人分享的江湖菜或家常菜。点菜控制在一荤一素一汤或小份组合，给饭后夜景留出体力。', 'https://www.amap.com/search?query=%E6%9D%A8%E5%AE%B6%E5%9D%AA%20%E6%B1%9F%E6%B9%96%E8%8F%9C&city=%E9%87%8D%E5%BA%86%E5%B8%82', '多人聚餐'],
+          ['较场口/临江门晚餐', '同学在渝中、且希望首晚直接看代表性夜景时再选。火锅、江湖菜和烧烤都可，但优先选支路餐厅；饭后去千厮门桥或江边外围看夜景，不进洪崖洞内部。', 'https://www.amap.com/search?query=%E8%BE%83%E5%9C%BA%E5%8F%A3%20%E7%81%AB%E9%94%85&city=%E9%87%8D%E5%BA%86%E5%B8%82', '夜景优先'],
+          ['南滨路/弹子石晚餐', '同学在南岸、天气晴朗且想边吃边看江景时再选。晚餐后只走一段江边或老街，不追加爬坡；结束较晚时直接打车回杨家坪。', 'https://www.amap.com/search?query=%E5%8D%97%E6%BB%A8%E8%B7%AF%20%E6%B1%9F%E6%B9%96%E8%8F%9C&city=%E9%87%8D%E5%BA%86%E5%B8%82', '江景备选'],
+          ['冰粉/凉糕/烧烤加餐', '若正餐结束早、还想继续聊天，可作为轻量收尾；若火锅吃得较重则只选甜品，不再叠加烧烤。', 'https://www.amap.com/search?query=%E6%9D%A8%E5%AE%B6%E5%9D%AA%20%E5%86%B0%E7%B2%89&city=%E9%87%8D%E5%BA%86%E5%B8%82', '轻量收尾']
+        ],
+        center: [
+          ['两路口/大坪小面', '适合安排在三峡博物馆、李子坝和鹅岭一线的早餐或午餐，吃完再开始坡道较多的步行。', 'https://www.xiaohongshu.com/search_result?keyword=%E4%B8%A4%E8%B7%AF%E5%8F%A3%20%E5%A4%A7%E5%9D%AA%20%E5%B0%8F%E9%9D%A2', '小面'],
+          ['仪表厂火锅老店', '携程火锅条目中可见的大井巷社区火锅候选，适合在中心西侧活动结束后就近补一顿市井火锅。', 'https://you.ctrip.com/fooditem/chongqing158/7756020-p1.html', '火锅'],
+          ['香老坎火锅大坪石油路店', '携程火锅条目中可见的大坪方向候选，适合杨家坪基地的中心西侧补餐，不需要为了它专门去解放碑。', 'https://you.ctrip.com/fooditem/chongqing158/7756020-p1.html', '火锅'],
+          ['较场口/临江门烧烤', '适合中心区晚间散步后吃烧烤，但要避开洪崖洞正门和商场内的游客餐饮，优先看支路和居民区评价。', 'https://www.xiaohongshu.com/search_result?keyword=%E8%BE%83%E5%9C%BA%E5%8F%A3%20%E7%83%A7%E7%83%A4%20%E9%87%8D%E5%BA%86', '烧烤']
+        ],
+        riverside: [
+          ['江北嘴酒店早餐小面', '如果入住亚朵类酒店，可以先用含早解决主食，再把上午留给江北嘴江边和大剧院，不必为了早餐额外奔波。', 'https://hotels.ctrip.com/hotels/132915536.html', '小面'],
+          ['北滨路江湖菜', '适合江景散步后就近用餐，选择家常江湖菜即可，主动避开朝天门和洪崖洞入口附近的游客餐。', 'https://www.xiaohongshu.com/search_result?keyword=%E5%8C%97%E6%BB%A8%E8%B7%AF%20%E6%B1%9F%E6%B9%96%E8%8F%9C%20%E9%87%8D%E5%BA%86', '江湖菜'],
+          ['朝天门/小什字老火锅', '可以安排社区老火锅，但要优先查看居民区评价和当日排队情况，不把景区门口的店当作默认答案。', 'https://you.ctrip.com/fooditem/chongqing158/7756020-p1.html', '火锅'],
+          ['冰粉/凉糕/山城汤圆', '适合在火锅或烧烤后作为甜口收尾，也可以在不想再吃正餐的晚上单独解决。', 'https://www.xiaohongshu.com/search_result?keyword=%E9%87%8D%E5%BA%86%20%E5%86%B0%E7%B2%89%20%E5%87%89%E7%B3%95%20%E5%B1%B1%E5%9F%8E%E6%B1%A4%E5%9C%86', '小吃']
+        ]
+      };
+
+      const scenes = {
+        core: [
+          ['山城巷/第三步道', '石梯、吊脚楼、悬空栈道，最能体现重庆坡坎。', 'https://www.cqyz.gov.cn/zjyz/lyyz/rmdkd/202202/t20220215_10397629.html', '步道'],
+          ['十八梯', '适合傍晚拍街巷和灯光，和山城巷可同日。', 'https://www.xiaohongshu.com/search_result?keyword=%E9%87%8D%E5%BA%86%20%E5%8D%81%E5%85%AB%E6%A2%AF%20%E6%8B%8D%E7%85%A7', '街巷'],
+          ['白象居/湖广会馆', '老楼、江景、索道构图，注意居民生活边界。', 'https://www.xiaohongshu.com/search_result?keyword=%E9%87%8D%E5%BA%86%20%E7%99%BD%E8%B1%A1%E5%B1%85%20%E6%B9%96%E5%B9%BF%E4%BC%9A%E9%A6%86', '拍照'],
+          ['千厮门桥远观洪崖洞', '不进洪崖洞内部，在桥和江边取景更省力。', 'https://www.xiaohongshu.com/search_result?keyword=%E5%8D%83%E5%8E%AE%E9%97%A8%E6%A1%A5%20%E6%B4%AA%E5%B4%96%E6%B4%9E%20%E6%8B%8D%E7%85%A7', '夜景']
+        ],
+        south: [
+          ['龙门浩老街', '南岸历史街区，适合落地日和傍晚江景。', 'https://www.cqna.gov.cn/jz/tyjjd/sy/dt_59966/202503/t20250317_14411210.html', '老街'],
+          ['下浩里/南滨路', '轻松散步，看渝中天际线，餐饮也方便。', 'https://www.xiaohongshu.com/search_result?keyword=%E4%B8%8B%E6%B5%A9%E9%87%8C%20%E5%8D%97%E6%BB%A8%E8%B7%AF%20%E6%8B%8D%E7%85%A7', '江岸'],
+          ['弹子石老街', '南岸补充选项，适合不想过江的晚上。', 'https://www.xiaohongshu.com/search_result?keyword=%E5%BC%B9%E5%AD%90%E7%9F%B3%E8%80%81%E8%A1%97%20%E9%87%8D%E5%BA%86', '老街'],
+          ['南山/老君洞', '晴天看山城夜景，雨天不强求。', 'https://www.xiaohongshu.com/search_result?keyword=%E9%87%8D%E5%BA%86%20%E5%8D%97%E5%B1%B1%20%E8%80%81%E5%90%9B%E6%B4%9E%20%E5%A4%9C%E6%99%AF', '夜景']
+        ],
+        old: [
+          ['重庆动物园', '杨家坪生活线开头，近锦怡豪生和 2 号线。', 'https://cqjlp.gov.cn/bmjz/qzfbm_97119/qwhlyw_97727/zwgk_97124/gkml/jczwgk/ggwhfwly/ggfw/ggwljgml/202608/t20260807_15904141.html', '动物园'],
+          ['黄桷坪/川美老校区', '涂鸦街、老校区和小馆子，生活感强。', 'https://www.xiaohongshu.com/search_result?keyword=%E9%BB%84%E6%A1%B7%E5%9D%AA%20%E5%B7%9D%E7%BE%8E%20%E8%80%81%E6%A0%A1%E5%8C%BA', '街区'],
+          ['交通茶馆', '老重庆气质强，但体验重于环境舒适度。', 'https://www.xiaohongshu.com/search_result?keyword=%E4%BA%A4%E9%80%9A%E8%8C%B6%E9%A6%86%20%E9%87%8D%E5%BA%86', '茶馆'],
+          ['李子坝/佛图关/鹅岭二厂', '立体交通和山城摄影，适合后半程。', 'https://www.xiaohongshu.com/search_result?keyword=%E6%9D%8E%E5%AD%90%E5%9D%9D%20%E4%BD%9B%E5%9B%BE%E5%85%B3%20%E9%B9%85%E5%B2%AD%E4%BA%8C%E5%8E%82', '交通']
+        ],
+        nature: [
+          ['武隆天生三桥', '本次自然奇观核心，优先级最高。', links.wulong, '自然'],
+          ['龙水峡地缝', '和天生三桥同日组合，胜过硬塞仙女山。', links.wulong, '自然'],
+          ['仙女山', '若以后愿意武隆住一晚再加入，本次只作备选。', links.wulong, '备选'],
+          ['三峡博物馆', '雨天和高温替代，兼顾城市理解。', 'https://www.cq.gov.cn/zjcq/cycq/jplyxl/dsy/dsjp/202608/t20260826_15982331.html', '室内']
+        ]
+      };
+
+      const baseDays = {
+        arrivalMeetup: [
+          ['上午', '抵达后前往杨家坪', '07:25 深圳早班机抵达后，先前往杨家坪酒店寄存行李或办理入住。若实际落地接近中午，下午只保留酒店周边与杨家坪步行街，不强行加景点。'],
+          ['中午', '杨家坪第一餐', '11:30-13:00 在酒店周边吃小面、抄手、豆花饭或简单家常菜。首餐以适应辣度和补充体力为目的，不安排火锅，也不为某一家面馆跨区。'],
+          ['下午', '轻走杨家坪，给晚上留体力', '14:00-17:30 在杨家坪步行街、谢家湾或重庆动物园外围三选一轻走，顺便熟悉 2 号线。若旅途疲惫，直接回酒店休息，晚上汇合优先。'],
+          ['晚上', '与同学汇合：聚餐 + 夜景', '17:30 后先确认同学位置、人数与订位。大家都方便到九龙坡时，选杨家坪/谢家湾社区火锅、串串或江湖菜，饭后在附近散步；同学在渝中且想首晚看代表性夜景，则在较场口/临江门支路用餐，饭后只走千厮门桥或江边外围；同学在南岸、天气晴朗才选南滨路/弹子石。首晚不把“吃到某一家店”设为硬任务，结束较晚直接打车回杨家坪。']
+        ],
+        arrivalSouth: [
+          ['上午', '抵达与入住', '07:25 深圳早班机；按约 09:35 抵达后，优先完成取行李、前往南坪和酒店寄存。若实际落地晚于 10:30，下午只保留龙门浩或酒店休息。'],
+          ['中午', '南坪小面/抄手', '11:30-13:00 就近解决第一餐，优先小面、抄手或豆花饭，先适应辣度和步行节奏，不把落地第一顿安排成火锅。'],
+          ['下午', '龙门浩、下浩里、南滨路', '14:30-18:00 走南岸慢线：龙门浩与下浩里二选一深入，南滨路只保留江景段；阴雨时缩短户外，改为酒店休息或弹子石老街。'],
+          ['晚上', '南坪社区火锅', '18:30-21:00 以哈儿土火锅、邓记莽子等南坪社区候选为主，饭后只在住宿区附近散步；不为网红店跨江，也不在洪崖洞核心区用餐。']
+        ],
+        wulong: [
+          ['上午', '重庆东站到武隆南', '06:45-07:15 从住宿区打车出发，按已购车次前往重庆东站；抵达武隆南后先接景区交通，不把换乘希望押在临时打车上。'],
+          ['中午', '游客中心简餐', '11:30-13:00 以景区补给、自带水和简单主食为主；不为寻找餐厅折返，把时间留给景区排队和步行。'],
+          ['下午', '天生三桥 + 龙水峡地缝', '13:00-17:30 只抓两个自然奇观点，按当天开放和体力决定先后；仙女山不与本日硬拼，除非临时放弃其中一个峡谷景点。'],
+          ['晚上', '回主城休息', '返程后直接回原 base；若回到重庆已较晚，优先清淡简餐和洗漱，不再安排夜景或跨城吃饭。武隆本次按主城一日往返，不单独住一晚。']
+        ],
+        oldLife: [
+          ['上午', '重庆动物园/杨家坪', '09:00-12:00 以动物园和杨家坪生活区为主；如果不想进动物园，就把时间换成 2 号线沿线、杨家坪步行街和居民市场，保留老城区观察感。'],
+          ['中午', '黄桷坪豆花饭/蹄花汤', '12:00-13:30 把午餐放在黄桷坪老社区，优先豆花饭、蹄花汤或联防食店家常菜；不因评价不确定而跨区追店。'],
+          ['下午', '交通茶馆、川美老校区', '14:00-17:30 交通茶馆和川美老校区作为一条慢线，重点看街巷、涂鸦和居民生活；高温或雨天可缩短户外，保留茶馆和一处室内休息。'],
+          ['晚上', '谢家湾/大坪火锅或烧烤', '18:30 后回谢家湾、大坪或杨家坪附近吃社区火锅、烧烤；若午餐偏重，晚上改吃小面、抄手或烧烤，不连续安排两顿大餐。']
+        ],
+        coreWalk: [
+          ['上午', '山城巷、十八梯', '09:30-12:00 先走山城巷再到十八梯，利用白天光线和相对可控的人流；坡道较多，鞋服和体力要按步行日准备。'],
+          ['中午', '较场口江湖菜', '12:00-13:30 就近吃江湖菜，选择辣子鸡、毛血旺、酸汤兔等方向即可；优先居民区或支路店，不把洪崖洞正门餐饮当主选。'],
+          ['下午', '白象居、湖广会馆', '14:00-17:30 选择白象居与湖广会馆中的一条主线，另一处作为体力充足时的加项；重点拍老楼、索道和江岸层次，不追求打卡数量。'],
+          ['晚上', '千厮门桥远观洪崖洞', '18:30-21:00 只做桥上、江边和外围远观，避开洪崖洞内部拥挤动线；晚餐回较场口、解放碑边缘或住宿区解决。']
+        ],
+        westCity: [
+          ['上午', '三峡博物馆/人民大礼堂', '换住日或中心西侧日优先安排 09:30-12:00；先处理寄存、入住和休息，再选三峡博物馆或大礼堂，不建议两个馆点都赶成打卡。'],
+          ['中午', '两路口/上清寺小面', '12:00-13:30 在新 base 附近吃小面、抄手或家常菜，给下午李子坝线留体力；若仍在办理入住，先寄存行李再用餐。'],
+          ['下午', '李子坝、佛图关、鹅岭二厂', '14:00-18:00 以李子坝和佛图关为主，鹅岭二厂视天气与体力加入；雨天优先保留李子坝和室内休息，晴天再延长到观景点。'],
+          ['晚上', '大坪/两路口社区火锅', '18:30 后在大坪、两路口或酒店周边吃社区火锅；这是后半程补火锅的主窗口，不为了某家店再跨江折返。']
+        ],
+        riverNight: [
+          ['上午', '长江索道或朝天门', '09:30-12:00 长江索道和朝天门只选一项作为主线；若排队明显超过预期，立即改为索道外观、白象居或朝天门江边，不用把上午耗在排队上。'],
+          ['中午', '小什字/朝天门简餐', '12:00-13:30 在小什字、朝天门支路或江北嘴附近简餐，优先小面、江湖菜或社区店，避免景区入口高溢价餐饮。'],
+          ['下午', '江北嘴、大剧院、科技馆外观', '14:00-17:30 以江北嘴、大剧院和江边步道为主，从北岸看渝中天际线；天气闷热时减少连续暴走，保留大剧院外观和江边一段即可。'],
+          ['晚上', '江北嘴/南山夜景', '18:30 后根据天气二选一：晴朗且体力足去南山看全景，阴雨或不想折返则留在江北嘴、北滨路散步；最后一晚不再安排复杂换乘。']
+        ],
+        lijiaArrival: [
+          ['上午', '抵达礼嘉', '落地后先到礼嘉 base 寄存或入住，不把第一天做成跨城观光；若机场出发顺利，下午再补光环或照母山。'],
+          ['中午', '光环/金州大道简餐', '11:30-13:00 在光环或金州大道附近解决简餐，优先小面、抄手、豆花饭或商圈内较稳妥的本地菜。'],
+          ['下午', '光环购物公园、照母山轻走', '14:30-17:30 选择光环购物公园或照母山其中一处，作为舒适落地日；不把礼嘉第一天安排成高强度爬坡和跨江。'],
+          ['晚上', '两江新区火锅/江湖菜', '18:30 后以酒店周边 15 分钟交通半径内的火锅或江湖菜为主；C 方案的价值是睡眠和节奏，不为吃一顿饭牺牲晚间通勤。']
+        ],
+        guanyinqiao: [
+          ['上午', '观音桥/北仓', '09:30-12:00 从礼嘉前往观音桥/北仓，先完成江北商圈和街区体验；只走一条片区线，不把观音桥、北仓和多个商场全部塞满。'],
+          ['中午', '江北小馆', '12:00-13:30 吃小面、豆花饭或江湖菜，优先就近解决；若下午决定去黄桷坪，中午不要安排过量火锅。'],
+          ['下午', '黄桷坪或酒店休整二选一', '这是 C 方案补老重庆生活感的弹性段：想体验烟火气就去黄桷坪，若前几天武隆消耗明显则回礼嘉休息，不强行跨城。'],
+          ['晚上', '礼嘉/观音桥晚餐', '18:30 后在礼嘉或观音桥收尾，按下午实际落点就近吃；不为了夜宵再横跨重庆。']
+        ],
+        jiangbeiTransfer: [
+          ['上午', '换住江北嘴/朝天门', '10:00 前后退房、寄存或转运行李；换住完成后再开始江景线，不要拖着行李进入解放碑和老街坡道。'],
+          ['中午', '酒店周边', '12:00-13:30 在江北嘴、朝天门或酒店附近简餐，先把入住和休息稳定下来，再决定下午是否增加城市节点。'],
+          ['下午', '大剧院、科技馆、江北嘴江边', '14:30-17:30 先看北岸江景、大剧院和科技馆外观，不急着进解放碑；这段为后两晚夜景升级预热，节奏应比核心区步行日更松。'],
+          ['晚上', '北滨路/江北嘴夜景', '18:30 后在酒店江景、江北嘴江边或北滨路中选一处；晚餐优先北滨路江湖菜、火锅或小吃，避免再去游客最密集的洪崖洞正门。']
+        ],
+        returnDay: [
+          ['上午', '早餐后去机场', '按返程航班时间倒推：建议至少提前 2.5 小时离开住宿区；早餐、退房、取行李和打车都要留余量，不在机场日安排景点。'],
+          ['中午', '返程航班', '10.11 返程日期固定；若航班时间较早，上午内容只保留早餐和前往江北机场 T3。'],
+          ['下午', '抵达深圳', '不安排重庆景点；预留航班延误、取行李和返程交通缓冲。'],
+          ['晚上', '回程恢复', '回程日只保留恢复体力和整理行李，不把任何“没去成”的重庆点硬挪到返程当天。']
+        ]
+      };
+
+      const plans = {
+        B: {
+          title: 'B 老重庆体验优先',
+          fit: '愿意换一次酒店，换取最完整的老重庆生活线与渝中核心体验。',
+          reason: '10 月 5 日至 7 日住杨家坪，把 2 号线、动物园、居民区早餐、联防食店家常菜和黄桷坪慢线串成一段真正的老重庆生活。10 月 8 日搬到较场口或解放碑边缘，集中完成山城巷、十八梯、白象居、索道与夜景。前半程住进重庆日常，后半程再进入城市地标，层次最清楚。',
+          metrics: [['住宿安排', '10.5-10.7 杨家坪/大坪，10.8-10.10 较场口边缘'], ['体验重点', '老社区、川美街区、交通茶馆和本地餐饮最完整'], ['需要接受', '10.7 去武隆要比南坪更早准备；杨家坪前往重庆东站优先打车']],
+          hotelKeys: ['yangDaping', 'jiefangbei'],
+          foodKeys: ['meetup', 'old', 'center'],
+          sceneKeys: ['old', 'core', 'nature'],
+          days: [
+            ['10.5', '杨家坪落地与同学汇合', ['airport', 'yangjiaping'], baseDays.arrivalMeetup],
+            ['10.6', '黄桷坪生活线', ['yangjiaping', 'huangjueping'], baseDays.oldLife],
+            ['10.7', '武隆日', ['yangjiaping', 'east', 'wulong', 'yangjiaping'], baseDays.wulong],
+            ['10.8', '换住较场口', ['yangjiaping', 'jiefangbei', 'shancheng'], baseDays.coreWalk],
+            ['10.9', '朝天门/索道', ['jiefangbei', 'chaotianmen', 'jiangbeizui'], baseDays.riverNight],
+            ['10.10', '博物馆与李子坝', ['jiefangbei', 'museum', 'eling', 'daping'], baseDays.westCity],
+            ['10.11', '返程', ['jiefangbei', 'airport'], baseDays.returnDay]
+          ]
+        },
+        D: {
+          title: 'D 少搬家升级版',
+          fit: '只换一次住宿，前段稳定做自然与老城，最后两晚把江景和夜景集中升级。',
+          reason: '10 月 5 日至 8 日连续住在杨家坪，完成落地、老重庆生活、武隆和渝中核心；武隆也可以在 10 月 6 日与 7 日之间根据天气调整。10 月 9 日再搬到江北嘴或朝天门，最后两晚专门收尾江景、博物馆和夜景。',
+          metrics: [['住宿安排', '10.5-10.8 杨家坪；10.9-10.10 江北嘴/朝天门'], ['体验重点', '只换一次住宿，前段稳定，最后两晚江景升级'], ['需要接受', '10.8 做完渝中活动后仍要回杨家坪；当天不宜排得过满']],
+          hotelKeys: ['yangDaping', 'jiangbei'],
+          foodKeys: ['meetup', 'old', 'riverside', 'center'],
+          sceneKeys: ['south', 'old', 'core', 'nature'],
+          days: [
+            ['10.5', '杨家坪落地与同学汇合', ['airport', 'yangjiaping'], baseDays.arrivalMeetup],
+            ['10.6', '老重庆生活', ['yangjiaping', 'huangjueping'], baseDays.oldLife],
+            ['10.7', '武隆日（可与 10.6 调换）', ['yangjiaping', 'east', 'wulong', 'yangjiaping'], baseDays.wulong],
+            ['10.8', '山城核心', ['yangjiaping', 'shancheng', 'jiefangbei', 'chaotianmen', 'yangjiaping'], baseDays.coreWalk],
+            ['10.9', '换江北嘴', ['yangjiaping', 'jiangbeizui', 'chaotianmen'], baseDays.jiangbeiTransfer],
+            ['10.10', '中心补漏夜景', ['jiangbeizui', 'museum', 'eling', 'nanshan'], baseDays.riverNight],
+            ['10.11', '返程', ['jiangbeizui', 'airport'], baseDays.returnDay]
+          ]
+        },
+        E: {
+          title: 'E 全程不换住宿',
+          fit: '最省心的单基地方案，适合不想搬行李、希望每天回到同一家酒店的人。',
+          reason: '10 月 5 日至 10 日全程住在杨家坪。杨家坪、黄桷坪、动物园和九龙坡餐饮可以自然完成，武隆作为一次独立的一日往返；渝中、朝天门、江北嘴和南岸则安排成几次明确的跨区日。用固定基地换取入住稳定、天气调整自由和更低的整理成本。',
+          metrics: [['住宿安排', '10.5-10.10 连住六晚，杨家坪为唯一基地'], ['体验重点', '不搬行李，老重庆生活最自然，天气变化时最容易调整'], ['需要接受', '去渝中、江北嘴和南岸的往返更长；夜景日不宜安排过多跨区节点']],
+          hotelKeys: ['yangDaping'],
+          foodKeys: ['meetup', 'old', 'center', 'riverside'],
+          sceneKeys: ['south', 'old', 'core', 'nature'],
+          days: [
+            ['10.5', '杨家坪落地与同学汇合', ['airport', 'yangjiaping'], baseDays.arrivalMeetup],
+            ['10.6', '武隆日', ['yangjiaping', 'east', 'wulong', 'yangjiaping'], baseDays.wulong],
+            ['10.7', '老重庆生活', ['yangjiaping', 'huangjueping'], baseDays.oldLife],
+            ['10.8', '山城核心', ['yangjiaping', 'shancheng', 'jiefangbei', 'chaotianmen', 'yangjiaping'], baseDays.coreWalk],
+            ['10.9', '李子坝与鹅岭', ['yangjiaping', 'museum', 'eling', 'daping', 'yangjiaping'], baseDays.westCity],
+            ['10.10', '江北嘴或南山夜景', ['yangjiaping', 'chaotianmen', 'jiangbeizui', 'nanshan', 'yangjiaping'], baseDays.riverNight],
+            ['10.11', '返程', ['yangjiaping', 'airport'], baseDays.returnDay]
+          ]
+        }
+      };
+
+      const compareRows = [
+        ['B', '10.5-10.7 杨家坪；10.8-10.10 较场口/解放碑边缘', '体验最完整', '老社区、黄桷坪、交通茶馆与渝中核心分段完成', '换一次酒店；武隆日需更早去重庆东站'],
+        ['D', '10.5-10.8 杨家坪；10.9-10.10 江北嘴/朝天门', '少搬家兼江景', '前段稳定，最后两晚集中看江景与夜景', '10.8 活动后仍需回杨家坪'],
+        ['E', '10.5-10.10 连住杨家坪', '最省心', '不搬行李，老重庆线自然，天气调整最灵活', '去渝中、江北嘴和南岸的往返更长']
+      ];
+
+      let activePlan = 'B';
+      let activeDay = 0;
+      let activeSlot = 0;
+      let cqMap = null;
+      let cqProvider = null;
+      let cqMarkers = [];
+      let cqRoute = null;
+      let cqMapLoading = null;
+      let cqBaseLayer = null;
+      const mapConfigKey = 'cq-trip-map-config';
+      let deferredInstallPrompt = null;
+
+      function shareStateUrl() {
+        const url = new URL(window.location.href);
+        url.hash = `plan=${encodeURIComponent(activePlan)}&day=${activeDay}&slot=${activeSlot}`;
+        return url.toString();
+      }
+
+      function syncUrlState() {
+        if (!window.history || !window.history.replaceState) return;
+        window.history.replaceState(null, '', shareStateUrl());
+      }
+
+      function restoreUrlState() {
+        const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+        const planKey = params.get('plan');
+        const dayIndex = Number(params.get('day'));
+        const slotIndex = Number(params.get('slot'));
+        if (plans[planKey]) activePlan = planKey;
+        if (Number.isInteger(dayIndex) && dayIndex >= 0 && dayIndex < plans[activePlan].days.length) activeDay = dayIndex;
+        if (Number.isInteger(slotIndex) && slotIndex >= 0 && slotIndex < 4) activeSlot = slotIndex;
+        root.querySelectorAll('.tab').forEach(tab => {
+          tab.setAttribute('aria-selected', String(tab.dataset.plan === activePlan));
+        });
+      }
+
+      function setShareStatus(text) {
+        root.querySelector('#share-status').textContent = text;
+      }
+
+      async function shareCurrentView() {
+        const plan = plans[activePlan];
+        const day = plan.days[activeDay];
+        const slot = day[3][activeSlot];
+        const url = shareStateUrl();
+        const text = `重庆旅行册：${activePlan} ${plan.title} · ${day[0]} ${slot[0]} · ${slot[1]}`;
+        try {
+          if (navigator.share) {
+            await navigator.share({ title: '重庆 10.5-10.11 旅行册', text, url });
+            setShareStatus('已打开系统分享面板');
+            return;
+          }
+          await navigator.clipboard.writeText(`${text}\n${url}`);
+          setShareStatus('当前视图链接已复制');
+        } catch (error) {
+          if (error && error.name === 'AbortError') return;
+          setShareStatus('分享失败，可复制浏览器地址栏链接');
+        }
+      }
+
+      async function installBook() {
+        if (!deferredInstallPrompt) return;
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        root.querySelector('#install-book').hidden = true;
+      }
+
+      function registerOfflineShell() {
+        if (!('serviceWorker' in navigator)) return;
+        if (!['http:', 'https:'].includes(window.location.protocol)) {
+          setShareStatus('文件模式可浏览文字与外链；安装和自动离线缓存需使用网页链接');
+          return;
+        }
+        navigator.serviceWorker.register('./service-worker.js').catch(() => {
+          setShareStatus('离线缓存暂不可用，但当前在线页面仍可正常使用');
+        });
+      }
+
+      function getMapConfig() {
+        let saved = {};
+        try { saved = JSON.parse(localStorage.getItem(mapConfigKey) || '{}'); } catch (error) {}
+        return {
+          provider: root.querySelector('#map-provider').value,
+          amapKey: root.querySelector('#amap-key').value.trim() || saved.amapKey || '',
+          amapSecurity: root.querySelector('#amap-security').value.trim() || saved.amapSecurity || '',
+          baiduAk: root.querySelector('#baidu-ak').value.trim() || saved.baiduAk || ''
+        };
+      }
+
+      function saveMapConfig(config) {
+        try { localStorage.setItem(mapConfigKey, JSON.stringify(config)); } catch (error) {}
+      }
+
+      function loadSavedMapConfig() {
+        let saved = {};
+        try { saved = JSON.parse(localStorage.getItem(mapConfigKey) || '{}'); } catch (error) {}
+        if (saved.provider) root.querySelector('#map-provider').value = saved.provider;
+        if (saved.amapKey) root.querySelector('#amap-key').value = saved.amapKey;
+        if (saved.amapSecurity) root.querySelector('#amap-security').value = saved.amapSecurity;
+        if (saved.baiduAk) root.querySelector('#baidu-ak').value = saved.baiduAk;
+        updateMapConfigForm();
+      }
+
+      function updateMapConfigForm() {
+        const provider = root.querySelector('#map-provider').value;
+        root.querySelector('#amap-key-label').hidden = provider !== 'amap';
+        root.querySelector('#amap-security-label').hidden = provider !== 'amap';
+        root.querySelector('#baidu-key-label').hidden = provider !== 'baidu';
+        root.querySelector('#map-config-note').textContent = provider === 'amap'
+          ? '高德 JS API 2.0 需要 Key；若控制台启用了安全密钥，也填写 securityJsCode。配置只保存在本机浏览器。若只显示点线而没有底图，优先补安全密钥或切换 OpenStreetMap。'
+          : provider === 'baidu'
+            ? '百度地图 JavaScript API GL 需要 AK；配置只保存在本机浏览器。建议在百度控制台把 localhost/127.0.0.1 加入白名单。'
+            : 'OpenStreetMap 使用公开瓦片服务，不需要 Key；适合本地预览和高德/百度鉴权暂未完成时的地图查看。';
+      }
+
+      function loadScript(src, id, ready) {
+        if (ready()) return Promise.resolve();
+        if (cqMapLoading) return cqMapLoading;
+        cqMapLoading = new Promise((resolve, reject) => {
+          const existing = document.getElementById(id);
+          if (existing) {
+            existing.addEventListener('load', resolve, { once: true });
+            existing.addEventListener('error', () => reject(new Error('地图脚本加载失败')), { once: true });
+            return;
+          }
+          const script = document.createElement('script');
+          script.id = id;
+          script.src = src;
+          script.async = true;
+          script.onload = resolve;
+          script.onerror = () => reject(new Error('地图脚本加载失败'));
+          document.head.appendChild(script);
+        }).finally(() => { cqMapLoading = null; });
+        return cqMapLoading;
+      }
+
+      function resetMap() {
+        const mapEl = root.querySelector('#leaflet-map');
+        if (cqMap && cqProvider === 'amap' && cqMap.destroy) cqMap.destroy();
+        if (cqMap && cqProvider === 'baidu' && cqMap.clearOverlays) cqMap.clearOverlays();
+        if (cqMap && cqProvider === 'osm' && cqMap.remove) cqMap.remove();
+        cqMap = null;
+        cqProvider = null;
+        cqMarkers = [];
+        cqRoute = null;
+        cqBaseLayer = null;
+        mapEl.innerHTML = '';
+      }
+
+      function renderOfflineRoute(day, slotIndex, message) {
+        const route = routeForSlot(day, slotIndex);
+        const nodes = route.length
+          ? route.map((key, index) => {
+              const p = points[key];
+              const link = mapLinks(p[0], key).amap;
+              const node = `<div class="offline-route-node"><i>${index + 1}</i><div><b>${p[0]}</b><a href="${link}" target="_blank" rel="noreferrer">联网后打开高德地图</a></div></div>`;
+              return index < route.length - 1 ? `${node}<div class="offline-route-arrow" aria-hidden="true">↓</div>` : node;
+            }).join('')
+          : '<p>当前时段暂无已标注节点，请按右侧文字计划执行。</p>';
+        root.querySelector('#leaflet-map').innerHTML = `
+          <div class="offline-route">
+            <h3>${day[0]} · ${slotLabels[slotIndex]} · 离线路线示意</h3>
+            <p>${message}</p>
+            <div class="offline-route-nodes">${nodes}</div>
+          </div>`;
+      }
+
+      async function initMap(day, slotIndex) {
+        const config = getMapConfig();
+        saveMapConfig(config);
+        const mapEl = root.querySelector('#leaflet-map');
+        if (cqMap && cqProvider !== config.provider) resetMap();
+        try {
+          if (config.provider === 'amap') {
+            if (!config.amapKey) {
+              renderOfflineRoute(day, slotIndex, '未配置高德 Key，当前显示本地路线顺序；联网后可点击节点打开高德地图。');
+              return false;
+            }
+            window._AMapSecurityConfig = config.amapSecurity ? { securityJsCode: config.amapSecurity } : undefined;
+            await loadScript(`https://webapi.amap.com/maps?v=2.0&key=${encodeURIComponent(config.amapKey)}`, 'cq-amap-script', () => Boolean(window.AMap));
+            if (!window.AMap) throw new Error('高德 API 未就绪');
+            cqMap = new AMap.Map(mapEl, {
+              zoom: 11,
+              center: [106.56, 29.56],
+              resizeEnable: true,
+              viewMode: '2D',
+              mapStyle: 'amap://styles/normal',
+              layers: [new AMap.TileLayer()]
+            });
+            cqProvider = 'amap';
+          } else if (config.provider === 'baidu') {
+            if (!config.baiduAk) {
+              renderOfflineRoute(day, slotIndex, '未配置百度 AK，当前显示本地路线顺序；联网后可点击节点打开地图。');
+              return false;
+            }
+            const callback = '__cqBaiduMapReady';
+            window[callback] = function () {};
+            await loadScript(`https://api.map.baidu.com/api?v=1.0&type=webgl&ak=${encodeURIComponent(config.baiduAk)}&callback=${callback}`, 'cq-baidu-script', () => Boolean(window.BMapGL));
+            if (!window.BMapGL) throw new Error('百度 API 未就绪');
+            cqMap = new BMapGL.Map(mapEl);
+            cqMap.enableScrollWheelZoom(true);
+            cqMap.centerAndZoom(new BMapGL.Point(106.56, 29.56), 11);
+            cqProvider = 'baidu';
+          } else {
+            await loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', 'cq-leaflet-script', () => Boolean(window.L));
+            if (!window.L) throw new Error('OpenStreetMap 地图库未就绪');
+            cqMap = L.map(mapEl, { zoomControl: true, attributionControl: true }).setView([29.56, 106.56], 11);
+            cqBaseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              maxZoom: 19,
+              attribution: '&copy; OpenStreetMap contributors'
+            });
+            cqBaseLayer.on('tileerror', () => {
+              setMapNote('OpenStreetMap 瓦片加载失败；当前浏览器或网络可能拦截外部地图瓦片。路线与标记仍可用，请切换网络或使用高德/百度。');
+            });
+            cqBaseLayer.addTo(cqMap);
+            cqProvider = 'osm';
+          }
+          setTimeout(() => {
+            if (cqMap && cqMap.resize) cqMap.resize();
+            if (cqMap && cqMap.checkResize) cqMap.checkResize();
+            if (cqMap && cqMap.invalidateSize) cqMap.invalidateSize();
+          }, 80);
+          return true;
+        } catch (error) {
+          renderOfflineRoute(day, slotIndex, `地图底图暂时不可用：${error.message}。路线顺序和地点外链仍保留。`);
+          return false;
+        }
+      }
+
+      const imageByName = {
+        '南坪国际会展中心步行街亚朵': ['https://ak-d.tripcdn.com/images/0206p120008eq51pu7083_R_960_660_R5_D.jpg', '酒店实拍图'],
+        '南滨路皇冠国际江景亚朵': ['https://content.skyscnr.com/available/2307556802/2307556802_WxH.jpg', '酒店实拍图'],
+        '重庆新天地大坪亚朵': ['https://res.klook.com/klook-hotel/image/upload/fl_lossy.progressive%2Cw_1200%2Ch_630%2Cc_fill%2Cq_85/s10akd/1mc0w12000atxkrop1B71.jpg', '酒店实拍图'],
+        '大礼堂嘉陵江滨江路亚朵': ['https://res.klook.com/klook-hotel/image/upload/fl_lossy.progressive%2Cw_1200%2Ch_630%2Cc_fill%2Cq_85/s10akd/1mc0w12000atxkrop1B71.jpg', '酒店实拍图/同品牌参考'],
+        '江北嘴金融街亚朵': ['https://ak-d.tripcdn.com/images/1mc1a12000qat9db5D1C5.jpg', '酒店实拍图'],
+        '重庆金科大酒店': ['https://ak-d.tripcdn.com/images/1mc1a12000qat9db5D1C5.jpg', '酒店环境参考图'],
+        '重庆解放碑威斯汀': ['https://image.nbd.com.cn/uploads/articles/images/1256971/3.jpg', '中心区夜景参考图'],
+        '龙门浩老街': ['https://res.cqnews.net/ires/2022/11/8/Ur4N4xJXNeDMOtVSwSierDdgU1M56WFFRFC.png', '地点实拍图'],
+        '下浩里/南滨路': ['https://res.cqnews.net/ires/2022/11/8/Ur4N4xJXNeDMOtVSwSierDdgU1M56WFFRFC.png', '地点实拍图'],
+        '十八梯': ['https://image.nbd.com.cn/uploads/articles/images/1256971/3.jpg', '地点实拍图'],
+        '白象居/湖广会馆': ['https://n.sinaimg.cn/sinakd20220525ac/0/w640h960/20220525/0c36-81f457f62953aa1d046ca152ca80da23.jpg', '地点实拍图'],
+        '千厮门桥远观洪崖洞': ['https://wy-static.wenxiaobai.com/aigc-online/17f2624d-9dd7-8cb6-a601-11ac73a6d923.webp?ratioWH=1.6008537886873&type=opt', '夜景参考图'],
+        '重庆动物园': ['https://n.sinaimg.cn/sinakd20220525ac/0/w640h960/20220525/0c36-81f457f62953aa1d046ca152ca80da23.jpg', '城市生活参考图'],
+        '黄桷坪/川美老校区': ['https://res.cqnews.net/ires/2022/11/8/Ur4N4xJXNeDMOtVSwSierDdgU1M56WFFRFC.png', '街区氛围参考图'],
+        '交通茶馆': ['https://res.cqnews.net/ires/2022/11/8/Ur4N4xJXNeDMOtVSwSierDdgU1M56WFFRFC.png', '街区氛围参考图'],
+        '李子坝/佛图关/鹅岭二厂': ['https://res.klook.com/klook-hotel/image/upload/fl_lossy.progressive%2Cw_1200%2Ch_630%2Cc_fill%2Cq_85/s10akd/1mc0w12000atxkrop1B71.jpg', '城市建筑参考图'],
+        '武隆天生三桥': ['https://res.klook.com/image/upload/c_fill%2Cw_627%2Ch_470/q_80/w_80%2Cx_15%2Cy_15%2Cg_south_west%2Cl_Klook_water_br_trans_yhcmh3/activities/mtjokq3u0cbtyeyqqtge.jpg', '自然景观实拍图'],
+        '龙水峡地缝': ['https://res.klook.com/image/upload/c_fill%2Cw_627%2Ch_470/q_80/w_80%2Cx_15%2Cy_15%2Cg_south_west%2Cl_Klook_water_br_trans_yhcmh3/activities/mtjokq3u0cbtyeyqqtge.jpg', '自然景观参考图'],
+        '南坪小面/豌杂面': ['https://photocdn.sohu.com/20150710/mp22193039_1436516550367_1_th.jpeg', '小面类型参考图'],
+        '杨家坪小面/抄手': ['https://photocdn.sohu.com/20150710/mp22193039_1436516550367_1_th.jpeg', '小面类型参考图'],
+        '两路口/大坪小面': ['https://photocdn.sohu.com/20150710/mp22193039_1436516550367_1_th.jpeg', '小面类型参考图'],
+        '歪哥战友牛肉面': ['https://photocdn.sohu.com/20150710/mp22193039_1436516550367_1_th.jpeg', '牛肉面类型参考图，店面待核验'],
+        '43号面摊': ['https://photocdn.sohu.com/20150710/mp22193039_1436516550367_1_th.jpeg', '面食类型参考图，店面待核验'],
+        '哈儿土火锅南兴路店': ['https://mingchu.org/d/file/mingcai/mingdian/2022-08-26/6073e53db901f323d282d3ab3eaa28da.jpg', '社区火锅类型参考图'],
+        '邓记莽子老火锅南坪店': ['https://mingchu.org/d/file/mingcai/mingdian/2022-08-26/6073e53db901f323d282d3ab3eaa28da.jpg', '社区火锅类型参考图'],
+        '印象渝都杨家坪店': ['https://mingchu.org/d/file/mingcai/mingdian/2022-08-26/6073e53db901f323d282d3ab3eaa28da.jpg', '火锅类型参考图'],
+        '仪表厂火锅老店': ['https://mingchu.org/d/file/mingcai/mingdian/2022-08-26/6073e53db901f323d282d3ab3eaa28da.jpg', '社区火锅类型参考图'],
+        '香老坎火锅大坪石油路店': ['https://mingchu.org/d/file/mingcai/mingdian/2022-08-26/6073e53db901f323d282d3ab3eaa28da.jpg', '火锅类型参考图'],
+        '南坪烧烤/烤脑花': ['https://n.sinaimg.cn/front/249/w640h409/20180910/4Mrm-hivtsym0508008.jpg', '烧烤类型参考图'],
+        '较场口/临江门烧烤': ['https://k.sinaimg.cn/n/sinakd10121/232/w640h392/20200808/4f20-ixkvvue3368661.jpg/w700d1q75cms.jpg', '烧烤类型参考图'],
+        '黄桷坪蹄花汤/豆花饭': ['https://p5.itc.cn/q_70/images03/20210507/e85e65809dc64796acaaf3059dddec2b.jpeg', '豆花饭类型参考图'],
+        '路济亚豆花馆': ['https://p5.itc.cn/q_70/images03/20210507/e85e65809dc64796acaaf3059dddec2b.jpeg', '豆花饭类型参考图，店面待核验'],
+        '九龙坡区联防食店家常菜': ['https://p5.itc.cn/q_70/images03/20210507/e85e65809dc64796acaaf3059dddec2b.jpeg', '家常菜类型参考图，店面待核验'],
+        '黄桷坪江湖菜': ['https://p5.itc.cn/q_70/images03/20210507/e85e65809dc64796acaaf3059dddec2b.jpeg', '地方菜类型参考图'],
+        '北滨路江湖菜': ['https://p5.itc.cn/q_70/images03/20210507/e85e65809dc64796acaaf3059dddec2b.jpeg', '地方菜类型参考图'],
+        '武隆碗碗羊肉/乌江鱼': ['https://p5.itc.cn/q_70/images03/20210507/e85e65809dc64796acaaf3059dddec2b.jpeg', '地方菜类型参考图'],
+        '冰粉/凉糕/山城汤圆': ['https://p5.itc.cn/q_70/images03/20210507/e85e65809dc64796acaaf3059dddec2b.jpeg', '小吃类型参考图']
+      };
+
+      const fallbackImageByType = {
+        '酒店': ['https://ak-d.tripcdn.com/images/0206p120008eq51pu7083_R_960_660_R5_D.jpg', '酒店图片参考'],
+        '升级': ['https://ak-d.tripcdn.com/images/1mc1a12000qat9db5D1C5.jpg', '酒店图片参考'],
+        '江景': ['https://res.cqnews.net/ires/2022/11/8/Ur4N4xJXNeDMOtVSwSierDdgU1M56WFFRFC.png', '江景环境参考'],
+        '自然': ['https://res.klook.com/image/upload/c_fill%2Cw_627%2Ch_470/q_80/w_80%2Cx_15%2Cy_15%2Cg_south_west%2Cl_Klook_water_br_trans_yhcmh3/activities/mtjokq3u0cbtyeyqqtge.jpg', '自然景观参考'],
+        '火锅': ['https://mingchu.org/d/file/mingcai/mingdian/2022-08-26/6073e53db901f323d282d3ab3eaa28da.jpg', '火锅类型参考'],
+        '烧烤': ['https://n.sinaimg.cn/front/249/w640h409/20180910/4Mrm-hivtsym0508008.jpg', '烧烤类型参考'],
+        '小面': ['https://photocdn.sohu.com/20150710/mp22193039_1436516550367_1_th.jpeg', '小面类型参考'],
+        '指定': ['https://photocdn.sohu.com/20150710/mp22193039_1436516550367_1_th.jpeg', '菜品类型参考'],
+        '特色': ['https://p5.itc.cn/q_70/images03/20210507/e85e65809dc64796acaaf3059dddec2b.jpeg', '地方菜类型参考'],
+        '江湖菜': ['https://p5.itc.cn/q_70/images03/20210507/e85e65809dc64796acaaf3059dddec2b.jpeg', '地方菜类型参考'],
+        '景区': ['https://res.klook.com/image/upload/c_fill%2Cw_627%2Ch_470/q_80/w_80%2Cx_15%2Cy_15%2Cg_south_west%2Cl_Klook_water_br_trans_yhcmh3/activities/mtjokq3u0cbtyeyqqtge.jpg', '景区参考图'],
+        '地方菜': ['https://p5.itc.cn/q_70/images03/20210507/e85e65809dc64796acaaf3059dddec2b.jpeg', '地方菜类型参考'],
+        '小吃': ['https://p5.itc.cn/q_70/images03/20210507/e85e65809dc64796acaaf3059dddec2b.jpeg', '小吃类型参考'],
+        '交通': ['https://res.cqnews.net/ires/2022/11/8/Ur4N4xJXNeDMOtVSwSierDdgU1M56WFFRFC.png', '城市环境参考'],
+        '步道': ['https://image.nbd.com.cn/uploads/articles/images/1256971/3.jpg', '步道实拍参考'],
+        '街巷': ['https://image.nbd.com.cn/uploads/articles/images/1256971/3.jpg', '街巷实拍参考'],
+        '拍照': ['https://n.sinaimg.cn/sinakd20220525ac/0/w640h960/20220525/0c36-81f457f62953aa1d046ca152ca80da23.jpg', '拍照环境参考'],
+        '夜景': ['https://wy-static.wenxiaobai.com/aigc-online/17f2624d-9dd7-8cb6-a601-11ac73a6d923.webp?ratioWH=1.6008537886873&type=opt', '夜景参考'],
+        '老街': ['https://res.cqnews.net/ires/2022/11/8/Ur4N4xJXNeDMOtVSwSierDdgU1M56WFFRFC.png', '老街实拍参考'],
+        '江岸': ['https://res.cqnews.net/ires/2022/11/8/Ur4N4xJXNeDMOtVSwSierDdgU1M56WFFRFC.png', '江岸实拍参考'],
+        '动物园': ['https://n.sinaimg.cn/sinakd20220525ac/0/w640h960/20220525/0c36-81f457f62953aa1d046ca152ca80da23.jpg', '城市生活参考'],
+        '街区': ['https://res.cqnews.net/ires/2022/11/8/Ur4N4xJXNeDMOtVSwSierDdgU1M56WFFRFC.png', '街区氛围参考'],
+        '茶馆': ['https://res.cqnews.net/ires/2022/11/8/Ur4N4xJXNeDMOtVSwSierDdgU1M56WFFRFC.png', '街区氛围参考'],
+        '室内': ['https://image.nbd.com.cn/uploads/articles/images/1256971/3.jpg', '城市参考图'],
+        '备选': ['https://res.cqnews.net/ires/2022/11/8/Ur4N4xJXNeDMOtVSwSierDdgU1M56WFFRFC.png', '环境参考图']
+      };
+
+      function thumb(name, type, source) {
+        const image = imageByName[name] || fallbackImageByType[type] || fallbackImageByType['备选'];
+        return `<div class="thumb">
+          <a href="${source || image[0]}" target="_blank" rel="noreferrer">
+            <img src="${image[0]}" alt="${name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.hidden=false">
+            <span class="thumb-fallback" hidden>图片源暂时无法热链<br>点击打开详情/图源查看实拍</span>
+          </a>
+          <span class="thumb-label">${image[1]}</span>
+        </div>`;
+      }
+
+      function flatten(keys, source) {
+        const out = [];
+        keys.forEach(k => (source[k] || []).forEach(item => out.push(item)));
+        const seen = new Set();
+        return out.filter(item => {
+          if (seen.has(item[0])) return false;
+          seen.add(item[0]);
+          return true;
+        }).slice(0, 8);
+      }
+
+      function card(item) {
+        return `<article class="mini-card">
+          ${thumb(item[0], item[3], item[2])}
+          <div class="mini-card-body">
+            <h3>${item[0]}</h3>
+            <p>${item[1]}</p>
+            <div class="links">
+              <a class="tiny-link" href="${item[2]}" target="_blank" rel="noreferrer">详情/图源</a>
+            </div>
+          </div>
+        </article>`;
+      }
+
+      const stayByPlan = {
+        B: { early: 'yangDaping', late: 'jiefangbei', split: 3 },
+        D: { early: 'yangDaping', late: 'jiangbei', split: 4 },
+        E: { early: 'yangDaping', late: 'yangDaping', split: 99 }
+      };
+
+      const featuredByPlan = {
+        B: {
+          0: { 3: ['杨家坪社区火锅/串串', '较场口/临江门晚餐', '南滨路/弹子石晚餐'] },
+          1: { 1: ['九龙坡区联防食店家常菜'] },
+          3: { 3: ['43号面摊'] },
+          4: { 1: ['路济亚豆花馆'] }
+        },
+        D: {
+          0: { 3: ['杨家坪社区火锅/串串', '较场口/临江门晚餐', '南滨路/弹子石晚餐'] },
+          1: { 1: ['九龙坡区联防食店家常菜'] }
+        },
+        E: {
+          0: { 3: ['杨家坪社区火锅/串串', '较场口/临江门晚餐', '南滨路/弹子石晚餐'] },
+          2: { 1: ['九龙坡区联防食店家常菜'] },
+          4: { 1: ['路济亚豆花馆'] }
+        }
+      };
+
+      function findFood(name) {
+        return Object.values(foods).flat().find(item => item[0] === name);
+      }
+
+      function addUnique(items, next) {
+        next.forEach(item => {
+          if (item && !items.some(existing => existing[0] === item[0])) items.push(item);
+        });
+        return items;
+      }
+
+      function currentStayKey(planKey, dayIndex) {
+        const stay = stayByPlan[planKey];
+        return dayIndex < stay.split ? stay.early : stay.late;
+      }
+
+      function stayContextForSlot(planKey, dayIndex, slotIndex) {
+        const stay = stayByPlan[planKey];
+        const earlyTitle = (hotels[stay.early] || [])[0]?.[0] || '前段住宿 base';
+        const lateTitle = (hotels[stay.late] || [])[0]?.[0] || '后段住宿 base';
+        if (stay.early === stay.late || dayIndex < stay.split) {
+          return { title: earlyTitle, note: '当前时段仍在同一住宿 base 内活动。' };
+        }
+        if (dayIndex > stay.split) {
+          return { title: lateTitle, note: '前一日已完成换住，今天从后段住宿 base 出发。' };
+        }
+        if (slotIndex === 0) {
+          return { title: earlyTitle, note: `上午先从前段 base 退房或寄存行李，再前往${lateTitle}所在区域。` };
+        }
+        if (slotIndex === 1) {
+          return { title: lateTitle, note: '中午前后完成转运行李或办理入住；下午行程按后一段 base 组织。' };
+        }
+        return { title: lateTitle, note: '当天已完成换住，晚间直接回后一段 base，避免再跨城折返。' };
+      }
+
+      function stayItems(planKey, dayIndex, phase) {
+        const stay = stayByPlan[planKey];
+        const key = currentStayKey(planKey, dayIndex);
+        const items = [...(hotels[key] || [])];
+        if (phase === 'morning' && dayIndex === stay.split && stay.early !== stay.late) {
+          return (hotels[stay.early] || []).map(item => [item[0], `退房/寄存后换到后段 base；${item[1]}`, item[2], item[3]]);
+        }
+        if (phase === 'evening' && dayIndex === stay.split && stay.early !== stay.late) {
+          return (hotels[stay.late] || []).map(item => [item[0], `当天已完成换住；${item[1]}`, item[2], item[3]]);
+        }
+        return items;
+      }
+
+      function transportItem(title, text, key) {
+        return [title, text, mapLinks(title, key).amap, '交通', key];
+      }
+
+      function foodItemsForDay(title, slotIndex) {
+        if (title.includes('武隆')) {
+          return [
+            ['武隆景区简餐/自带水', '只把午餐当补给，不为餐厅折返；天生三桥和地缝日优先保证游玩时间。', links.wulong, '景区'],
+            ['武隆碗碗羊肉/乌江鱼', '若返程较早且不赶时间，可在武隆城区补一顿地方菜；不作为固定要求。', 'https://www.amap.com/search?query=%E6%AD%A6%E9%9A%86%20%E7%A2%97%E7%A2%97%E7%BE%8A%E8%82%89%20%E4%B9%8C%E6%B1%9F%E9%B1%BC&city=%E9%87%8D%E5%BA%86%E5%B8%82', '地方菜']
+          ];
+        }
+        if (title.includes('同学汇合')) return flatten(['meetup'], foods);
+        if (title.includes('老重庆') || title.includes('杨家坪') || title.includes('黄桷坪')) return flatten(['old'], foods).slice(slotIndex === 1 ? 1 : 0, 4);
+        if (title.includes('礼嘉') || title.includes('南坪') || title.includes('南岸')) return flatten(['south'], foods).slice(0, 4);
+        if (title.includes('换江北嘴') || title.includes('夜景') || title.includes('朝天门')) return flatten(['riverside', 'center'], foods).slice(0, 4);
+        return flatten(['center', 'riverside'], foods).slice(0, 4);
+      }
+
+      function sceneItemsForDay(title) {
+        if (title.includes('武隆')) return scenes.nature;
+        if (title.includes('老重庆') || title.includes('杨家坪') || title.includes('黄桷坪')) return scenes.old;
+        if (title.includes('南坪') || title.includes('礼嘉') || title.includes('南岸')) return scenes.south;
+        if (title.includes('夜景') || title.includes('江北嘴') || title.includes('朝天门')) return [...scenes.core, ...scenes.south].slice(0, 4);
+        return scenes.core;
+      }
+
+      function featuredItems(planKey, dayIndex, slotIndex) {
+        const names = featuredByPlan[planKey]?.[dayIndex]?.[slotIndex] || [];
+        return names.map(findFood).filter(Boolean);
+      }
+
+      function detailCard(item) {
+        const map = mapLinks(item[0], item[4]);
+        return `<article class="mini-card">
+          ${thumb(item[0], item[3], item[2])}
+          <div class="mini-card-body">
+            <h3>${item[0]}</h3>
+            <p>${item[1]}</p>
+            <div class="links">
+              <a class="tiny-link" href="${item[2]}" target="_blank" rel="noreferrer">详情/图源</a>
+              <a class="tiny-link" href="${map.amap}" target="_blank" rel="noreferrer">高德地图</a>
+              <a class="tiny-link" href="${map.baidu}" target="_blank" rel="noreferrer">百度地图</a>
+            </div>
+          </div>
+        </article>`;
+      }
+
+      function slotItems(planKey, dayIndex, slotIndex, title) {
+        const items = [];
+        if (slotIndex === 0) {
+          addUnique(items, stayItems(planKey, dayIndex, 'morning'));
+          if (title.includes('武隆')) {
+            addUnique(items, [
+              transportItem('重庆东站 → 武隆南', '优先购买早班动车/高铁；从 base 打车去重庆东站，武隆南再接景区交通。', 'east'),
+              ...foodItemsForDay(title, 0).slice(0, 1)
+            ]);
+          } else if (title.includes('返程')) {
+            addUnique(items, [transportItem('住宿地 → 江北机场 T3', '建议 08:00-08:30 出发；不在返程日上午安排景点。', 'airport')]);
+          } else {
+            addUnique(items, foodItemsForDay(title, 0).filter(item => item[3] === '小面' || item[3] === '指定').slice(0, 2));
+          }
+        } else if (slotIndex === 1) {
+          addUnique(items, foodItemsForDay(title, 1).slice(0, 3));
+          addUnique(items, featuredItems(planKey, dayIndex, slotIndex));
+        } else if (slotIndex === 2) {
+          addUnique(items, sceneItemsForDay(title).slice(0, 4));
+          if (title.includes('武隆')) addUnique(items, [transportItem('武隆南 → 仙女山游客中心', '优先景区接驳或打车，现场以官方当日接驳为准。', 'wulong')]);
+        } else {
+          addUnique(items, foodItemsForDay(title, 3).slice(0, 3));
+          addUnique(items, featuredItems(planKey, dayIndex, slotIndex));
+          addUnique(items, stayItems(planKey, dayIndex, 'evening').slice(0, 2));
+        }
+        return items.slice(0, 5);
+      }
+
+      function mapLinks(name, key) {
+        const p = key && points[key];
+        const amap = p
+          ? `https://uri.amap.com/marker?position=${p[2]},${p[1]}&name=${encodeURIComponent(name)}&src=cqplanner&callnative=0`
+          : `https://www.amap.com/search?query=${encodeURIComponent(name)}&city=%E9%87%8D%E5%BA%86%E5%B8%82`;
+        const baidu = p
+          ? `https://api.map.baidu.com/marker?location=${p[1]},${p[2]}&title=${encodeURIComponent(name)}&content=${encodeURIComponent(name)}&output=html`
+          : `https://map.baidu.com/search/${encodeURIComponent(name)}`;
+        return { amap, baidu };
+      }
+
+      function popupHtml(name, key) {
+        const links = mapLinks(name, key);
+        return `<strong>${name}</strong><br><span style="font-size:12px">当天行程节点</span><br><a href="${links.amap}" target="_blank" rel="noreferrer">高德地图</a> · <a href="${links.baidu}" target="_blank" rel="noreferrer">百度地图</a>`;
+      }
+
+      function setMapNote(text) {
+        root.querySelector('#map-note').textContent = text;
+      }
+
+      const slotWindows = ['07:25-11:30', '11:30-13:30', '13:30-18:00', '18:00-22:00'];
+      const slotLabels = ['上午', '中午', '下午', '晚上'];
+
+      function routeForSlot(day, slotIndex) {
+        const route = (day[2] || []).filter(key => points[key]);
+        if (!route.length) return [];
+        if (day[1].includes('武隆')) {
+          if (slotIndex === 0) return [...new Set(route.slice(0, 3))];
+          if (slotIndex === 1) return [...new Set(route.slice(2, 3))];
+          if (slotIndex === 2) return [...new Set(route.slice(2, 3))];
+          return [...new Set(route.slice(-2))];
+        }
+        if (slotIndex === 0) return [...new Set(route.slice(0, 2))];
+        if (slotIndex === 1) return [...new Set(route.slice(1, 3))];
+        if (slotIndex === 2) return [...new Set(route.slice(1, 4))];
+        return [...new Set(route.slice(-2))];
+      }
+
+      function routeNames(day, slotIndex) {
+        return routeForSlot(day, slotIndex).map(key => points[key][0]).join(' → ') || '暂无已标注节点';
+      }
+
+      function slotTransport(day, slotIndex) {
+        const title = day[1];
+        if (title.includes('返程')) {
+          if (slotIndex === 0) return '酒店 → 江北机场 T3：打车优先，预留早高峰和安检时间。';
+          if (slotIndex === 1) return '机场办理值机与登机；不再安排重庆市内行程。';
+          return '返程缓冲，不安排新增景点。';
+        }
+        if (title.includes('武隆')) {
+          if (slotIndex === 0) return '住宿区打车 → 重庆东站 → 武隆南；优先早班动车/高铁。';
+          if (slotIndex === 1 || slotIndex === 2) return '武隆南/游客中心之间以景区接驳或短途打车为主。';
+          return '武隆南 → 重庆东站 → 住宿区；返程较晚时直接打车回酒店。';
+        }
+        if (title.includes('换住')) {
+          if (slotIndex === 0) return '前段酒店退房、寄存行李；轨道交通或打车换到后段 base。';
+          return '以轨道交通为主，短距离打车补足，避免为单个餐厅折返。';
+        }
+        if (slotIndex === 0) return '酒店出发：轨道交通优先，景点开门前后错峰。';
+        if (slotIndex === 1) return '在当前游玩片区就近用餐，不跨城追店。';
+        if (slotIndex === 2) return '轨道交通串联主要节点，坡坎和短距离接驳按体力调整。';
+        return '晚间以步行、轨道交通或短途打车回住宿区，减少折返。';
+      }
+
+      function renderSlotDetail(day, slotIndex) {
+        const slot = day[3][slotIndex];
+        const route = routeNames(day, slotIndex);
+        const stayContext = stayContextForSlot(activePlan, activeDay, slotIndex);
+        const moveHint = day[1].includes('换住')
+          ? stayContext.note
+          : day[1].includes('武隆')
+            ? '武隆按主城一日往返设计，不在武隆单独住宿；返程体力不足时以回酒店为优先。'
+            : '住宿只作为当前 base 参考，不把所有酒店备选同时塞进路线。';
+        root.querySelector('#slot-detail').innerHTML = `
+          <div class="section-title">
+            <h3>${day[0]} · ${slot[0]} · ${slot[1]}</h3>
+            <small>${slotWindows[slotIndex]}</small>
+          </div>
+          <p>${slot[2]}</p>
+          <div class="slot-detail-grid">
+            <div class="slot-detail-item"><small>当前时段路线节点</small><b>${route}</b></div>
+            <div class="slot-detail-item"><small>交通执行</small><b>${slotTransport(day, slotIndex)}</b></div>
+            <div class="slot-detail-item"><small>住宿关联</small><b>${stayContext.title}</b></div>
+            <div class="slot-detail-item"><small>本时段判断</small><b>${moveHint}</b></div>
+          </div>`;
+      }
+
+      function renderSlotOptions(planKey, dayIndex, slotIndex, day) {
+        const slot = day[3][slotIndex];
+        const items = slotItems(planKey, dayIndex, slotIndex, day[1]);
+        root.querySelector('#slot-options-caption').textContent = `${day[0]} · ${slot[0]} · ${slot[1]}`;
+        root.querySelector('#slot-options').innerHTML = `
+          <section class="day-detail">
+            <div class="day-detail-head">
+              <b>${slot[0]} · ${slot[1]}</b>
+              <small>${slotWindows[slotIndex]}</small>
+            </div>
+            <div class="day-detail-body">
+              <p class="day-detail-copy">${slot[2]}</p>
+              <div class="cards">${items.map(detailCard).join('')}</div>
+            </div>
+          </section>`;
+      }
+
+      async function renderMap(day, slotIndex) {
+        if (!cqMap) {
+          const ready = await initMap(day, slotIndex);
+          if (!ready) return;
+        }
+        const route = routeForSlot(day, slotIndex);
+        if (cqProvider === 'amap') {
+          if (cqMap.resize) cqMap.resize();
+          cqMap.clearMap();
+          const path = route.map(key => [points[key][2], points[key][1]]);
+          cqRoute = path.length > 1 ? new AMap.Polyline({
+            path,
+            strokeColor: '#b85f35',
+            strokeWeight: 5,
+            strokeOpacity: 0.82,
+            strokeStyle: route.includes('wulong') ? 'dashed' : 'solid'
+          }) : null;
+          if (cqRoute) cqRoute.setMap(cqMap);
+          cqMarkers = route.map((key, idx) => {
+            const p = points[key];
+            const marker = new AMap.Marker({
+              position: [p[2], p[1]],
+              title: p[0],
+              offset: new AMap.Pixel(-8, -8),
+              label: { content: `<span style="background:${idx === 0 ? '#2d8a63' : idx === route.length - 1 ? '#b85f35' : '#2563a6'};color:white;padding:3px 6px;border-radius:10px;font-size:11px;white-space:nowrap">${p[0]}</span>`, direction: 'top' }
+            });
+            marker.on('click', () => {
+              const info = new AMap.InfoWindow({ content: popupHtml(p[0], key), offset: new AMap.Pixel(0, -28) });
+              info.open(cqMap, marker.getPosition());
+            });
+            marker.setMap(cqMap);
+            return marker;
+          });
+          const fitItems = [...cqMarkers, cqRoute].filter(Boolean);
+          if (fitItems.length) cqMap.setFitView(fitItems, false, [30, 30, 30, 30]);
+        } else if (cqProvider === 'baidu') {
+          cqMap.clearOverlays();
+          const path = route.map(key => new BMapGL.Point(points[key][2], points[key][1]));
+          cqRoute = path.length > 1
+            ? new BMapGL.Polyline(path, { strokeColor: '#b85f35', strokeWeight: 5, strokeOpacity: 0.82 })
+            : null;
+          if (cqRoute) cqMap.addOverlay(cqRoute);
+          cqMarkers = route.map((key, idx) => {
+            const p = points[key];
+            const marker = new BMapGL.Marker(new BMapGL.Point(p[2], p[1]));
+            marker.addEventListener('click', () => {
+              const info = new BMapGL.InfoWindow(popupHtml(p[0], key));
+              cqMap.openInfoWindow(info, marker.getPosition());
+            });
+            cqMap.addOverlay(marker);
+            return marker;
+          });
+          if (path.length) cqMap.setViewport(path, { margins: [30, 30, 30, 30] });
+        } else if (cqProvider === 'osm') {
+          if (cqMap.invalidateSize) cqMap.invalidateSize();
+          cqMap.eachLayer(layer => {
+            if (layer !== cqBaseLayer) cqMap.removeLayer(layer);
+          });
+          const latLngs = route.map(key => [points[key][1], points[key][2]]);
+          cqRoute = latLngs.length > 1
+            ? L.polyline(latLngs, { color: '#b85f35', weight: 5, opacity: 0.82, dashArray: route.includes('wulong') ? '8 8' : null }).addTo(cqMap)
+            : null;
+          cqMarkers = route.map((key, idx) => {
+            const p = points[key];
+            const marker = L.marker([p[1], p[2]]).addTo(cqMap);
+            marker.bindPopup(popupHtml(p[0], key));
+            return marker;
+          });
+          const layers = [...cqMarkers, cqRoute].filter(Boolean);
+          if (layers.length) {
+            const group = L.featureGroup(layers);
+            cqMap.fitBounds(group.getBounds(), { padding: [28, 28], maxZoom: 13 });
+          }
+        }
+        const providerLabel = cqProvider === 'amap' ? '高德' : cqProvider === 'baidu' ? '百度' : 'OpenStreetMap';
+        setMapNote(`${day[0]} ${slotLabels[slotIndex]}：${providerLabel}底图；当前只显示本时段节点。路线为行程段示意，具体道路以当天导航为准。`);
+      }
+
+      function renderPlan() {
+        const plan = plans[activePlan];
+        const panel = root.querySelector('#plan-panel');
+        panel.setAttribute('aria-labelledby', `tab-${activePlan}`);
+        root.querySelector('#plan-title').textContent = plan.title;
+        root.querySelector('#plan-fit').textContent = plan.fit;
+        root.querySelector('#plan-reason').textContent = plan.reason;
+        root.querySelector('#plan-metrics').innerHTML = plan.metrics.map(m => `<div class="metric"><small>${m[0]}</small><b>${m[1]}</b><p class="lead" style="font-size:12px;margin-top:4px">${m[2] || ''}</p></div>`).join('');
+        root.querySelector('#day-buttons').innerHTML = plan.days.map((d, i) => `<button class="day-btn" type="button" aria-pressed="${i === activeDay}" data-day="${i}"><b>${d[0]}</b><br>${d[1]}</button>`).join('');
+        root.querySelector('#slot-buttons').innerHTML = slotLabels.map((label, i) => `
+          <button class="slot-btn" type="button" aria-pressed="${i === activeSlot}" data-slot="${i}">${label}</button>
+        `).join('');
+        const day = plan.days[activeDay];
+        renderSlotDetail(day, activeSlot);
+        renderSlotOptions(activePlan, activeDay, activeSlot, day);
+        syncUrlState();
+        renderMap(day, activeSlot);
+        root.querySelectorAll('.day-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            activeDay = Number(btn.dataset.day);
+            activeSlot = 0;
+            renderPlan();
+          });
+        });
+        root.querySelectorAll('.slot-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            activeSlot = Number(btn.dataset.slot);
+            renderPlan();
+          });
+        });
+      }
+
+      function renderCompare() {
+        root.querySelector('#compare-table').innerHTML = `<thead><tr><th>方案</th><th>住宿</th><th>定位</th><th>为什么保留</th><th>主要代价</th></tr></thead><tbody>${compareRows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>`;
+      }
+
+      root.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          activePlan = tab.dataset.plan;
+          activeDay = 0;
+          activeSlot = 0;
+          root.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t === tab)));
+          renderPlan();
+        });
+      });
+
+      root.querySelector('#map-provider').addEventListener('change', () => {
+        resetMap();
+        updateMapConfigForm();
+        renderMap(plans[activePlan].days[activeDay], activeSlot);
+      });
+      root.querySelector('#map-init').addEventListener('click', async () => {
+        resetMap();
+        await renderMap(plans[activePlan].days[activeDay], activeSlot);
+      });
+      root.querySelector('#share-book').addEventListener('click', shareCurrentView);
+      root.querySelector('#install-book').addEventListener('click', installBook);
+      window.addEventListener('beforeinstallprompt', event => {
+        event.preventDefault();
+        deferredInstallPrompt = event;
+        root.querySelector('#install-book').hidden = false;
+      });
+      window.addEventListener('appinstalled', () => {
+        deferredInstallPrompt = null;
+        root.querySelector('#install-book').hidden = true;
+        setShareStatus('旅行册已安装到设备');
+      });
+      loadSavedMapConfig();
+      restoreUrlState();
+      renderCompare();
+      renderPlan();
+      registerOfflineShell();
+    }());
+  </script>
+</div>
+
+</body>
+</html>
+
