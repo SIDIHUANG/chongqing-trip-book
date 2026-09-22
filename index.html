@@ -381,6 +381,29 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
     }
+    #cq-trip-planner .option-switch {
+      display: inline-flex;
+      gap: 4px;
+      padding: 3px;
+      border: 1px solid var(--cq-line);
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--muted) 35%, transparent);
+    }
+    #cq-trip-planner .option-tab {
+      border: 0;
+      border-radius: 7px;
+      padding: 6px 10px;
+      background: transparent;
+      color: var(--muted-foreground);
+      cursor: pointer;
+      font: inherit;
+      font-size: 12px;
+    }
+    #cq-trip-planner .option-tab[aria-selected="true"] {
+      background: var(--card);
+      color: var(--foreground);
+      box-shadow: 0 1px 3px color-mix(in srgb, var(--foreground) 12%, transparent);
+    }
     #cq-trip-planner .mini-card {
       border: 1px solid var(--cq-line);
       border-radius: 16px;
@@ -499,21 +522,23 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
   <div class="hero">
     <div class="hero-main">
       <h1>重庆 10.5-10.10 两套旅行计划</h1>
-      <p class="lead">南坪亚朵已确定为唯一住宿基地，10.5-10.10 连住并使用双人早餐。两套方案只比较游览节奏：A 先南岸再武隆，B 先老重庆、把武隆后置；武陵/武隆日不安排在 10.6，可在 10.7 或 10.8 按天气和车票调整。</p>
+      <p class="lead">南坪亚朵已确定为唯一住宿基地，10.5-10.10 连住并使用双人早餐。两套方案现在只比较租车跨度：A 在 10.9 单日租车完成南山自驾，B 在 10.8-10.9 连续租车；武隆返程当天的按摩只按回城时间弹性执行，10.9 不再强制按摩。</p>
       <div class="pill-row" style="margin-top:12px">
         <span class="pill"><strong>机票</strong> 海航深圳-重庆往返，出发早班优先</span>
         <span class="pill"><strong>住宿</strong> 南坪亚朵已确认，双人早餐</span>
         <span class="pill"><strong>餐饮</strong> 小面、火锅、烧烤、江湖菜全覆盖</span>
-        <span class="pill"><strong>节奏</strong> 武陵日不排 10.6，按天气机动</span>
+        <span class="pill"><strong>租车</strong> A 单日 / B 连续两日</span>
+        <span class="pill"><strong>恢复</strong> 武隆返程后弹性按摩，23:00 前结束</span>
       </div>
     </div>
     <div class="hero-side">
       <h2>当前结论</h2>
-      <p class="lead" style="margin-top:8px">住宿不再是变量：两套方案都住南坪亚朵。A 的顺序更均衡，B 更强调杨家坪、黄桷坪、交通茶馆等老重庆生活；指定餐饮会按区域放入，不为单家店跨城折返。</p>
+      <p class="lead" style="margin-top:8px">住宿不再是变量：两套方案都住南坪亚朵。A 控制为 10.9 单日租车，B 提前在 10.8 取车并连续使用到 10.9；两案都把南山自驾后的回酒店时间控制在 20:00-21:00，给 10.10 机场日留足睡眠。</p>
       <div class="summary-grid">
-        <div class="metric"><small>均衡覆盖</small><b>A 南岸经典</b></div>
-        <div class="metric"><small>老城优先</small><b>B 老重庆</b></div>
+        <div class="metric"><small>单日租车</small><b>A 灵活省车</b></div>
+        <div class="metric"><small>连续租车</small><b>B 少一次取还</b></div>
         <div class="metric"><small>共同前提</small><b>南坪连住</b></div>
+        <div class="metric"><small>机场日</small><b>10.10 10:50</b></div>
       </div>
       <div class="share-actions">
         <button id="share-book" type="button">分享当前视图</button>
@@ -524,8 +549,8 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
   </div>
 
   <div class="tabs" role="tablist" aria-label="两套计划">
-    <button class="tab" id="tab-A" role="tab" aria-controls="plan-panel" aria-selected="true" type="button" data-plan="A"><b>A 南岸慢游</b><span>均衡覆盖，武陵 10.7 首选</span></button>
-    <button class="tab" id="tab-B" role="tab" aria-controls="plan-panel" aria-selected="false" type="button" data-plan="B"><b>B 老重庆优先</b><span>黄桷坪先行，武陵 10.8 后置</span></button>
+    <button class="tab" id="tab-A" role="tab" aria-controls="plan-panel" aria-selected="true" type="button" data-plan="A"><b>A 单日租车</b><span>10.9 南山自驾，武隆返程后弹性按摩</span></button>
+    <button class="tab" id="tab-B" role="tab" aria-controls="plan-panel" aria-selected="false" type="button" data-plan="B"><b>B 连续两日租车</b><span>10.8-10.9 连续用车，10.9 不加按摩</span></button>
   </div>
 
   <div id="plan-panel" role="tabpanel" aria-labelledby="tab-A" aria-live="polite">
@@ -568,8 +593,12 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
 
       <div class="panel">
         <div class="section-title">
-          <h2>当前时段备选</h2>
+          <h2>当前时段参考</h2>
           <small id="slot-options-caption">随日期与时段切换</small>
+        </div>
+        <div id="option-switch" class="option-switch" role="tablist" aria-label="参考类型">
+          <button class="option-tab" type="button" role="tab" data-option-mode="food" aria-selected="true">餐饮备选</button>
+          <button class="option-tab" type="button" role="tab" data-option-mode="scene" aria-selected="false">景点 / 打卡点</button>
         </div>
         <div class="day-detail-list" id="slot-options"></div>
       </div>
@@ -637,11 +666,17 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
         jiefangbei: ['解放碑/较场口', 29.563, 106.577],
         shancheng: ['山城巷/十八梯', 29.559, 106.570],
         chaotianmen: ['朝天门/来福士', 29.565, 106.586],
+        baixiang: ['白象居', 29.565, 106.584],
+        huguang: ['湖广会馆', 29.562, 106.585],
+        qiansimen: ['千厮门桥/洪崖洞外围', 29.568, 106.586],
         jiangbeizui: ['江北嘴', 29.576, 106.580],
         lijia: ['礼嘉/光环', 29.633, 106.507],
         guanyinqiao: ['观音桥/北仓', 29.584, 106.533],
         museum: ['三峡博物馆/大礼堂', 29.560, 106.544],
-        nanshan: ['南山/夜景', 29.540, 106.590]
+        nanshan: ['南山/夜景', 29.540, 106.590],
+        nanshanTree: ['一棵树观景台', 29.539, 106.591],
+        laojundong: ['老君洞', 29.548, 106.596],
+        nanshanGarden: ['南山植物园/大金鹰', 29.555, 106.604]
       };
 
       const links = {
@@ -695,10 +730,33 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
         ],
         riverside: [
           ['路济亚豆花馆', '北线顺路时的具体豆花馆，适合观音桥/花卉园方向午餐。', 'https://www.amap.com/search?query=%E8%B7%AF%E6%B5%8E%E4%BA%9A%E8%B1%86%E8%8A%B1%E9%A4%A8&city=%E9%87%8D%E5%BA%86%E5%B8%82', '指定']
+        ],
+        supplemental: [
+          ['李师傅牛肉面（重庆南坪步行街店）', '南岸区万寿二村8号附3号；抵达或南山出发前可顺路快速解决一碗面，具体营业状态当天核验。', 'https://www.amap.com/search?query=%E6%9D%8E%E5%B8%88%E5%82%85%E7%89%9B%E8%82%89%E9%9D%A2%20%E5%8D%97%E5%9D%AA%E6%AD%A5%E8%A1%8C%E8%A1%97&city=%E9%87%8D%E5%BA%86%E5%B8%82', '小面'],
+          ['7小面（南坪总店）', '南岸区珊瑚路8号1(1)11；距离南坪地铁站和步行街较近，适合抵达日下午或武隆出发前快速补餐。', 'https://www.amap.com/search?query=7%E5%B0%8F%E9%9D%A2%20%E5%8D%97%E5%9D%AA%E6%80%BB%E5%BA%97&city=%E9%87%8D%E5%BA%86%E5%B8%82', '小面'],
+          ['交通茶馆（始于1987年）', '黄桷坪街4号附6号，川美和涂鸦街旁；下午作为茶水/小吃停留点，不把它当正餐替代。', 'https://www.amap.com/search?query=%E4%BA%A4%E9%80%9A%E8%8C%B6%E9%A6%86%20%E9%BB%84%E6%A1%B7%E5%9D%AA&city=%E9%87%8D%E5%BA%86%E5%B8%82', '茶馆'],
+          ['渝口福重庆小面（解放碑步行街店）', '渝中区新华路89号；山城巷—十八梯上午线需要补充主食时，优先就近解决，不为网红店排长队。', 'https://www.amap.com/search?query=%E6%B8%9D%E5%8F%A3%E7%A6%8F%E9%87%8D%E5%BA%86%E5%B0%8F%E9%9D%A2%20%E8%A7%A3%E6%94%BE%E7%A2%91%E6%AD%A5%E8%A1%8C%E8%A1%97%E5%BA%97&city=%E9%87%8D%E5%BA%86%E5%B8%82', '小面'],
+          ['花市豌杂面（较场口店）', '渝中区民生路9号，周师兄火锅旁；白象居/湖广会馆前后可作为较场口方向的具体快餐点。', 'https://www.amap.com/search?query=%E8%8A%B1%E5%B8%82%E8%B1%8C%E6%9D%82%E9%9D%A2%20%E8%BE%83%E5%9C%BA%E5%8F%A3%E5%BA%97&city=%E9%87%8D%E5%BA%86%E5%B8%82', '小面'],
+          ['仙女山碗碗羊肉（政协综合楼店）', '武隆区巷口镇白杨路40号附3号；只在返程经过武隆城区且时间允许时选择，不为它从景区专程折返。', 'https://www.amap.com/search?query=%E4%BB%99%E5%A5%B3%E5%B1%B1%E7%A2%97%E7%A2%97%E7%BE%8A%E8%82%89%20%E6%94%BF%E5%8D%8F%E7%BB%BC%E5%90%88%E6%A5%BC%E5%BA%97&city=%E9%87%8D%E5%BA%86%E5%B8%82', '地方菜'],
+          ['老君洞道观-斋堂', '老君洞观前街内的斋堂，清淡素食；先确认当天开放，再作为南山日午餐的第一备选。', 'https://you.ctrip.com/food/chongqing158/20411275.html', '清淡'],
+          ['先机泉水鸡汤（南山老君洞店）', '携程攻略标注为南山风景区内、老君洞附近；适合南山午餐，但先核对营业与停车，不为单店绕行。', 'https://you.ctrip.com/food/ctripyouyoustar158/11138425.html', '地方菜'],
+          ['南山植物园游客服务点', '下午主景点结束前的具体补水节点；只解决饮水和小食，遇到拥堵优先下山回南坪。', 'https://www.amap.com/search?query=%E5%8D%97%E5%B1%B1%E6%A4%8D%E7%89%A9%E5%9B%AD%E6%B8%B8%E5%AE%A2%E6%9C%8D%E5%8A%A1%E4%B8%AD%E5%BF%83&city=%E9%87%8D%E5%BA%86%E5%B8%82', '补给'],
+          ['周恭恭拌面·重庆小面（南坪店）', '南岸区珊瑚路7号附7号，南坪地铁站6号口步行约490米；适合南山或武隆返程后的清淡晚餐。', 'https://www.amap.com/search?query=%E5%91%A8%E6%81%AD%E6%81%AD%E6%8B%8C%E9%9D%A2%20%E5%8D%97%E5%9D%AA%E5%BA%97&city=%E9%87%8D%E5%BA%86%E5%B8%82', '小面'],
+          ['肯德基（机场T3A餐厅）', '江北机场 T3A 航站楼内，公开条目留有电话 023-67156390；以当天航站楼动线和营业状态为准。', 'https://www.amap.com/search?query=%E8%82%AF%E5%BE%B7%E5%9F%BA%20%E6%9C%BA%E5%9CT3A%E9%A4%90%E5%8E%85&city=%E9%87%8D%E5%BA%86%E5%B8%82', '机场'],
+          ['星巴克（重庆机场T3值机大厅店）', 'T3 值机大厅内的具体咖啡点，适合退房后到机场的早餐/咖啡补位，不离开航站楼。', 'https://www.amap.com/search?query=%E6%98%9F%E5%B7%B4%E5%85%8B%20%E9%87%8D%E5%BA%86%E6%9C%BA%E5%9CT3%E5%80%BC%E6%9C%BA%E5%A4%A7%E5%8E%85%E5%BA%97&city=%E9%87%8D%E5%BA%86%E5%B8%82', '机场']
         ]
       };
 
       const scenes = {
+        arrival: [
+          ['南坪步行街', '抵达日下午只做酒店周边熟悉和补给；晚于 10:30 落地就不再远走。', 'https://www.amap.com/search?query=%E5%8D%97%E5%9D%AA%E6%AD%A5%E8%A1%8C%E8%A1%97&city=%E9%87%8D%E5%BA%86%E5%B8%82', '街区'],
+          ['南坪亚朵周边休整', '办理入住、寄存行李和与同学会合，作为疲劳或晚点时的低强度替代。', 'https://hotels.ctrip.com/hotels/71514584.html', '休整']
+        ],
+        airport: [
+          ['江北机场 T3 值机与候机区', '10.10 只完成早餐、退房、前往 T3、值机和安检；机场是返程日唯一执行地点。', 'https://www.amap.com/search?query=%E9%87%8D%E5%BA%86%E6%B1%9F%E5%8C%97%E6%9C%BA%E5%9C%BAT3&city=%E9%87%8D%E5%BA%86%E5%B8%82', '机场'],
+          ['T3 安检后登机口动线', '建议 08:00 前后抵达机场，安检后直接前往登机口，不再添加江北嘴或市区打卡。', 'https://www.amap.com/search?query=%E9%87%8D%E5%BA%86%E6%B1%9F%E5%8C%97%E6%9C%BA%E5%9C%BAT3%20%E7%99%BB%E6%9C%BA%E5%8F%A3&city=%E9%87%8D%E5%BA%86%E5%B8%82', '机场'],
+          ['返程结束', '下午和晚上均已离开重庆，不新增景点；卡片仅作为行程结束节点，避免误解为返程日仍有城市活动。', 'https://www.amap.com/search?query=%E9%87%8D%E5%BA%86%E6%B1%9F%E5%8C%97%E6%9C%BA%E5%9C%BA&city=%E9%87%8D%E5%BA%86%E5%B8%82', '机场']
+        ],
         core: [
           ['山城巷/第三步道', '石梯、吊脚楼、悬空栈道，最能体现重庆坡坎。', 'https://www.cqyz.gov.cn/zjyz/lyyz/rmdkd/202202/t20220215_10397629.html', '步道'],
           ['十八梯', '适合傍晚拍街巷和灯光，和山城巷可同日。', 'https://www.xiaohongshu.com/search_result?keyword=%E9%87%8D%E5%BA%86%20%E5%8D%81%E5%85%AB%E6%A2%AF%20%E6%8B%8D%E7%85%A7', '街巷'],
@@ -709,7 +767,9 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
           ['龙门浩老街', '南岸历史街区，适合落地日和傍晚江景。', 'https://www.cqna.gov.cn/jz/tyjjd/sy/dt_59966/202503/t20250317_14411210.html', '老街'],
           ['下浩里/南滨路', '轻松散步，看渝中天际线，餐饮也方便。', 'https://www.xiaohongshu.com/search_result?keyword=%E4%B8%8B%E6%B5%A9%E9%87%8C%20%E5%8D%97%E6%BB%A8%E8%B7%AF%20%E6%8B%8D%E7%85%A7', '江岸'],
           ['弹子石老街', '南岸补充选项，适合不想过江的晚上。', 'https://www.xiaohongshu.com/search_result?keyword=%E5%BC%B9%E5%AD%90%E7%9F%B3%E8%80%81%E8%A1%97%20%E9%87%8D%E5%BA%86', '老街'],
-          ['南山/老君洞', '晴天看山城夜景，雨天不强求。', 'https://www.xiaohongshu.com/search_result?keyword=%E9%87%8D%E5%BA%86%20%E5%8D%97%E5%B1%B1%20%E8%80%81%E5%90%9B%E6%B4%9E%20%E5%A4%9C%E6%99%AF', '夜景']
+          ['一棵树观景台', '南山自驾第一站，先看能见度和停车；雨雾明显时直接跳过。', 'https://www.amap.com/search?query=%E4%B8%80%E6%A3%B5%E6%A0%91%E8%A7%82%E6%99%AF%E5%8F%B0&city=%E9%87%8D%E5%BA%86%E5%B8%82', '夜景'],
+          ['老君洞', '南山自驾第二站，开放和停车合适才进入；不满足条件就沿线下山。', 'https://www.amap.com/search?query=%E8%80%81%E5%90%9B%E6%B4%9E&city=%E9%87%8D%E5%BA%86%E5%B8%82', '景区'],
+          ['南山植物园/大金鹰', '下午最后主景点二选一，避免把南山日变成多个景区打卡。', 'https://www.amap.com/search?query=%E5%8D%97%E5%B1%B1%E6%A4%8D%E7%89%A9%E5%9B%AD%20%E5%A4%A7%E9%87%91%E9%B9%B0&city=%E9%87%8D%E5%BA%86%E5%B8%82', '景区']
         ],
         old: [
           ['重庆动物园', '杨家坪生活线开头，近锦怡豪生和 2 号线。', 'https://cqjlp.gov.cn/bmjz/qzfbm_97119/qwhlyw_97727/zwgk_97124/gkml/jczwgk/ggwhfwly/ggfw/ggwljgml/202608/t20260807_15904141.html', '动物园'],
@@ -739,27 +799,33 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
           ['晚上', '南坪首晚聚餐：哈儿土火锅（南兴路店）', '18:30-21:00 首选哈儿土火锅（南兴路220附7号，携程详情可核验）；不吃火锅则改八嬢家常菜（南坪店），想吃特色鸡锅可选李子坝梁山鸡（南坪店）。三家都先确认同学人数、营业状态和排队情况，饭后只在南坪步行街附近散步。']
         ],
         southDay: [
-          ['上午', '酒店早餐后前往龙门浩', '酒店双人早餐后从南坪出发；晴天优先龙门浩老街，阴雨时缩短户外并保留南滨路平缓江岸段。'],
+          ['上午', '酒店早餐后前往龙门浩', '酒店双人早餐后从南坪出发；想换口味才改吃 43 号面摊，先确认营业。晴天按龙门浩老街 → 江岸视角顺序走，阴雨时缩短户外并保留南滨路平缓段。'],
           ['中午', '南滨路午餐：江景菜或八嬢家常菜', '12:00-13:30 首选南滨路沿线江景菜；若想回住宿区，选八嬢家常菜（南坪店）。前一晚若吃火锅，今天不再安排重辣锅底。'],
           ['下午', '下浩里、南滨路或弹子石', '龙门浩与下浩里二选一深入，体力足再去弹子石老街；不为打卡数量连续跨区。'],
           ['晚上', '南坪轻量晚餐：43 号面摊 / 神伙烧烤', '18:30 后回南坪，首选 43 号面摊；若未营业，改神伙烧烤（南坪总店）。为武陵日保留睡眠，不再安排跨区夜景。']
         ],
         wulong: [
-          ['上午', '重庆东站到武隆南', '06:45-07:15 从住宿区打车出发，按已购车次前往重庆东站；抵达武隆南后先接景区交通，不把换乘希望押在临时打车上。'],
+          ['上午', '前往武隆景区', 'A 方案：06:45-07:15 从住宿区打车前往重庆东站，按已购车次到武隆南后接景区交通。B 方案：约 05:45-06:00 在南坪取车，自驾前往武隆，预留 2.5-3 小时车程和景区停车/接驳时间；不再把租车与动车路线重复计算。'],
           ['中午', '天生三桥游客中心简餐', '11:30-13:00 以天生三桥游客中心简餐、自带水和简单主食为主；若返程较早，可在武隆城区补吃碗碗羊肉或乌江鱼，但不为餐厅折返。'],
           ['下午', '天生三桥 + 龙水峡地缝', '13:00-17:30 只抓两个自然奇观点，按当天开放和体力决定先后；仙女山不与本日硬拼，除非临时放弃其中一个峡谷景点。'],
-          ['晚上', '回主城休息', '返程后直接回原 base；若回到重庆已较晚，优先清淡简餐和洗漱，不再安排夜景或跨城吃饭。武隆本次按主城一日往返，不单独住一晚。']
+          ['晚上', '回主城：弹性按摩 / 直接休息', 'A 按动车返程安排，B 按自驾返程安排，均以先回南坪为目标。若 20:30 前回到酒店且体力允许，可在确认营业后做 60-90 分钟足疗或肩颈放松，最晚 23:00 结束；20:30-21:30 只考虑 60 分钟轻量项目，超过 21:30 或明显疲劳就直接清淡晚餐、洗漱和睡觉，不把按摩写成硬任务。']
+        ],
+        nanshanDrive: [
+          ['上午', '南坪取车 → 一棵树观景台', '08:30-09:00 取车（A 当天取，B 沿用 10.8 的车），先开往一棵树观景台。09:30-11:00 只在观景台停留拍摄山城层次；提前查山路和能见度，雨雾明显时跳过观景台，直接进入老君洞或缩短为南坪周边。'],
+          ['中午', '老君洞 → 南山沿线午餐', '11:00-12:00 老君洞作为第二站，先确认开放和停车，不满足条件就不硬闯。12:00-13:30 在南山沿线或下山顺路吃小面、豆花饭、家常菜；驾驶日不饮酒，也不为单一餐厅绕路。'],
+          ['下午', '南山植物园/大金鹰二选一 → 下山', '13:30-15:30 在南山植物园或大金鹰中选一处作为最后主景点；15:30-18:00 沿原路下山回南坪，遇到拥堵就立刻放弃第二个点。路线只保留南山主线，不串江北嘴、李子坝或多个商圈。'],
+          ['晚上', '还车 → 南坪晚餐，睡眠优先', '18:00-19:00 完成还车或停回指定租车点，目标 20:00-21:00 回南坪。晚餐在酒店附近清淡解决，10.9 不安排金色印象按摩；把体力和证件整理留给 10.10 06:00 早餐、07:00 出发的机场日。']
         ],
         oldLife: [
-          ['上午', '重庆动物园/杨家坪', '09:00-12:00 以动物园和杨家坪生活区为主；如果不想进动物园，就把时间换成 2 号线沿线、杨家坪步行街和居民市场，保留老城区观察感。'],
+          ['上午', '酒店早餐 → 重庆动物园/杨家坪', '默认先用南坪亚朵双人早餐；若确实想外出，再核验歪哥战友牛肉面且确认顺路，不为它绕行。09:00-12:00 在动物园、杨家坪步行街和居民市场中三选一；不想进动物园就保留社区生活线。'],
           ['中午', '黄桷坪午餐：联防食店家常菜 / 胡记蹄花汤', '12:00-13:30 首选九龙坡区联防食店家常菜（铁路一村）；备选胡记蹄花汤或独一栋雅洁食店，均与川美、交通茶馆顺路。'],
           ['下午', '交通茶馆、川美老校区', '14:00-17:30 交通茶馆和川美老校区作为一条慢线，重点看街巷、涂鸦和居民生活；高温或雨天可缩短户外，保留茶馆和一处室内休息。'],
           ['晚上', '杨家坪晚餐：印象渝都 / 陶婆婆火锅', '18:30 后首选印象渝都杨家坪店；排队过长或想换口味时选陶婆婆火锅、懒厨鱼府。午餐偏重则改歪哥战友牛肉面，不连续吃两顿大餐。']
         ],
         coreWalk: [
-          ['上午', '山城巷、十八梯', '09:30-12:00 先走山城巷再到十八梯，利用白天光线和相对可控的人流；坡道较多，鞋服和体力要按步行日准备。'],
+          ['上午', '山城巷 → 第三步道 → 十八梯', '09:30-12:00 按山城巷、第三步道、十八梯顺序走一条连续步行线，利用白天光线和相对可控的人流；坡道较多，穿防滑鞋，不在中途横穿多个商圈。雨天只保留山城巷或改三峡博物馆。'],
           ['中午', '较场口午餐：杨记隆府 / 支路江湖菜', '12:00-13:30 首选杨记隆府（较场口/解放碑方向，先确认分店与排队）；备选较场口支路江湖菜。避开洪崖洞正门游客餐饮，给下午白象居步行留时间。'],
-          ['下午', '白象居、湖广会馆', '14:00-17:30 选择白象居与湖广会馆中的一条主线，另一处作为体力充足时的加项；重点拍老楼、索道和江岸层次，不追求打卡数量。'],
+          ['下午', '白象居 → 湖广会馆（二选一深入）', '14:00-17:30 午餐后先到白象居；体力和排队允许再走湖广会馆，否则只深入一处。重点拍老楼、索道和江岸层次，雨天或步行过量就提前回南坪。'],
           ['晚上', '千厮门桥远观洪崖洞 + 珮姐火锅备选', '18:30-21:00 先在千厮门桥和江边外围远观洪崖洞；晚餐首选珮姐老火锅或周师兄火锅（解放碑店先查排队），若不想排队则回南坪就餐。']
         ],
         westCity: [
@@ -802,49 +868,50 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
 
       const plans = {
         A: {
-          title: 'A 南岸慢游 + 城市经典',
-          fit: '先适应南坪和南岸，再完成武隆、渝中与南山夜景，节奏均衡。',
-          reason: '两套方案都在南坪亚朵连住六晚并使用双人早餐。A 先用 10.6 完成龙门浩、下浩里和南滨路，10.7 首选武隆，之后按体力完成渝中、九龙坡和南山；武隆遇到天气或车票问题可顺延至 10.8。',
-          metrics: [['住宿安排', '10.5-10.10 南坪亚朵连住，双人早餐'], ['体验重点', '南岸、武隆、渝中、九龙坡和南山覆盖均衡'], ['需要接受', '武隆日早起且消耗大；10.8 城市线按排队情况取舍索道']],
+          title: 'A 单日租车：南山自驾',
+          fit: '只在 10.9 租车完成南山自驾，其他天按公共交通组织，返程后的按摩保持弹性。',
+          reason: 'A 与 B 共享老重庆、渝中、武隆和南山的游览顺序。A 在 10.8 使用公共交通往返武隆，10.9 早上再取车去南山并于 18:00 后还车；武隆返程按摩只在 20:30 前回到酒店且体力允许时安排，最晚 23:00 结束。',
+          metrics: [['住宿安排', '10.5-10.10 南坪亚朵连住，双人早餐'], ['租车安排', '10.9 单日取车、南山自驾、当晚还车'], ['恢复与风险', '按摩只放在武隆返程后按时间弹性执行；10.9 不强制按摩']],
           hotelKeys: ['nanping'],
           foodKeys: ['south', 'old', 'center', 'riverside'],
           sceneKeys: ['south', 'nature', 'core', 'old'],
           days: [
             ['10.5', '抵达南坪与同学汇合', ['airport', 'nanping'], baseDays.arrivalSouth],
-            ['10.6', '南岸：龙门浩—下浩里—南滨路', ['nanping', 'longmenhao'], baseDays.southDay],
-            ['10.7', '武陵/武隆自然日', ['nanping', 'east', 'wulong', 'nanping'], baseDays.wulong],
-            ['10.8', '解放碑—山城巷—白象居—洪崖洞外围', ['nanping', 'shancheng', 'jiefangbei', 'chaotianmen'], baseDays.coreWalk],
-            ['10.9', '杨家坪—黄桷坪老重庆生活线', ['nanping', 'yangjiaping', 'huangjueping'], baseDays.oldLife],
+            ['10.6', '杨家坪—黄桷坪老重庆生活线', ['nanping', 'yangjiaping', 'huangjueping'], baseDays.oldLife],
+            ['10.7', '渝中机动 / 山城巷与十八梯', ['nanping', 'shancheng', 'jiefangbei', 'baixiang', 'huguang', 'qiansimen'], baseDays.coreWalk],
+            ['10.8', '武陵/武隆自然日', ['nanping', 'east', 'wulong', 'nanping'], baseDays.wulong],
+            ['10.9', '南山自驾：一棵树—老君洞—植物园择一', ['nanping', 'nanshanTree', 'laojundong', 'nanshanGarden', 'nanping'], baseDays.nanshanDrive],
             ['10.10', '机场日：10:50 航班', ['nanping', 'airport'], baseDays.returnDay]
           ]
         },
         B: {
-          title: 'B 老重庆优先 + 自然日后置',
-          fit: '先完成杨家坪、黄桷坪和交通茶馆，把武隆放到 10.8，最后集中城市拍照。',
-          reason: 'B 把 10.6 留给杨家坪、动物园、黄桷坪和交通茶馆，10.7 作为渝中机动或休息日，10.8 再去武隆。这样不把武隆放在 10.6，也给天气和体力留出缓冲；两套方案都不换酒店。',
-          metrics: [['住宿安排', '10.5-10.10 南坪亚朵连住，双人早餐'], ['体验重点', '老社区、川美、交通茶馆和指定餐饮更完整'], ['需要接受', '武隆后只安排轻量城市线；10.7 若休息则需接受少一个深度景点']],
+          title: 'B 连续两日租车：武隆后接南山',
+          fit: '10.8-10.9 连续租车，减少两次取还车；10.9 南山自驾后直接回酒店，不追加按摩。',
+          reason: 'B 保留 10.6 杨家坪、黄桷坪生活线和 10.7 渝中机动，10.8 早起取车自驾前往武隆；返程后只按回城时间决定是否舒缓按摩。10.9 继续用同一台车按一棵树 → 老君洞 → 植物园择一的顺序完成南山，18:00 后还车，目标 20:00-21:00 回南坪。',
+          metrics: [['住宿安排', '10.5-10.10 南坪亚朵连住，双人早餐'], ['租车安排', '10.8 取车，连续使用至 10.9 南山自驾后还车'], ['恢复与风险', '武隆返程按摩仍为条件项；10.9 不安排按摩，优先保证 10.10 睡眠']],
           hotelKeys: ['nanping'],
           foodKeys: ['south', 'old', 'center', 'riverside'],
           sceneKeys: ['old', 'core', 'nature', 'south'],
           days: [
             ['10.5', '抵达南坪与同学汇合', ['airport', 'nanping'], baseDays.arrivalSouth],
             ['10.6', '杨家坪—黄桷坪老重庆生活线', ['nanping', 'yangjiaping', 'huangjueping'], baseDays.oldLife],
-            ['10.7', '渝中机动 / 山城巷与十八梯', ['nanping', 'shancheng', 'jiefangbei'], baseDays.coreWalk],
-            ['10.8', '武陵/武隆自然日', ['nanping', 'east', 'wulong', 'nanping'], baseDays.wulong],
-            ['10.9', '白象居—朝天门—江北嘴或南山', ['nanping', 'chaotianmen', 'jiangbeizui', 'nanshan'], baseDays.riverNight],
+            ['10.7', '渝中机动 / 山城巷与十八梯', ['nanping', 'shancheng', 'jiefangbei', 'baixiang', 'huguang', 'qiansimen'], baseDays.coreWalk],
+            ['10.8', '武陵/武隆自然日（自驾）', ['nanping', 'wulong', 'nanping'], baseDays.wulong],
+            ['10.9', '南山自驾：一棵树—老君洞—植物园择一', ['nanping', 'nanshanTree', 'laojundong', 'nanshanGarden', 'nanping'], baseDays.nanshanDrive],
             ['10.10', '机场日：10:50 航班', ['nanping', 'airport'], baseDays.returnDay]
           ]
         }
       };
 
       const compareRows = [
-        ['A', '10.5-10.10 连住南坪亚朵', '均衡覆盖', '南岸、武隆、渝中、九龙坡和南山按顺序完成', '武隆日早起；城市核心需按排队情况取舍'],
-        ['B', '10.5-10.10 连住南坪亚朵', '老重庆优先', '黄桷坪、交通茶馆、指定餐饮更完整，武隆后置', '10.7 作为机动日，武隆后不再安排重夜景']
+        ['A', '南坪亚朵连住；10.9 单日租车', '灵活省租车费', '只为南山自驾付一天租车成本，武隆返程按摩按时间弹性处理', '10.9 必须按时取还车；晚归不再按摩'],
+        ['B', '南坪亚朵连住；10.8-10.9 连续租车', '减少取还车次数', '武隆后接南山自驾，共用一段租车周期，10.9 仍以早回酒店为目标', '多一天租车成本；连续驾驶后更要控制晚间节奏']
       ];
 
       let activePlan = 'A';
       let activeDay = 0;
       let activeSlot = 0;
+      let optionMode = 'food';
       let cqMap = null;
       let cqProvider = null;
       let cqMarkers = [];
@@ -1136,11 +1203,16 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
         '街区': ['https://res.cqnews.net/ires/2022/11/8/Ur4N4xJXNeDMOtVSwSierDdgU1M56WFFRFC.png', '街区氛围参考'],
         '茶馆': ['https://res.cqnews.net/ires/2022/11/8/Ur4N4xJXNeDMOtVSwSierDdgU1M56WFFRFC.png', '街区氛围参考'],
         '室内': ['https://image.nbd.com.cn/uploads/articles/images/1256971/3.jpg', '城市参考图'],
-        '备选': ['https://res.cqnews.net/ires/2022/11/8/Ur4N4xJXNeDMOtVSwSierDdgU1M56WFFRFC.png', '环境参考图']
+        '备选': ['https://res.cqnews.net/ires/2022/11/8/Ur4N4xJXNeDMOtVSwSierDdgU1M56WFFRFC.png', '环境参考图'],
+        '补给': ['https://photocdn.sohu.com/20150710/mp22193039_1436516550367_1_th.jpeg', '便携补给参考'],
+        '路线补给': ['https://p5.itc.cn/q_70/images03/20210507/e85e65809dc64796acaaf3059dddec2b.jpeg', '沿线餐食参考'],
+        '清淡': ['https://p5.itc.cn/q_70/images03/20210507/e85e65809dc64796acaaf3059dddec2b.jpeg', '清淡餐食参考'],
+        '机场': ['https://res.cqnews.net/ires/2022/11/8/Ur4N4xJXNeDMOtVSwSierDdgU1M56WFFRFC.png', '机场环境参考'],
+        '休整': ['https://res.cqnews.net/ires/2022/11/8/Ur4N4xJXNeDMOtVSwSierDdgU1M56WFFRFC.png', '休整环境参考']
       };
 
       function thumb(name, type, source) {
-        const nonFoodTypes = ['酒店', '已确认酒店', '江景', '升级', '自然', '景区', '交通', '步道', '街巷', '拍照', '夜景', '老街', '动物园', '街区', '茶馆', '室内', '备选'];
+        const nonFoodTypes = ['酒店', '已确认酒店', '江景', '升级', '自然', '景区', '交通', '步道', '街巷', '拍照', '夜景', '老街', '动物园', '街区', '茶馆', '室内', '备选', '小吃', '补给', '机场', '休整', '路线补给', '清淡'];
         const image = imageByName[name] || (nonFoodTypes.includes(type) ? fallbackImageByType[type] : null);
         if (!image) {
           return `<div class="thumb thumb-unverified"><a href="${source || '#'}" target="_blank" rel="noreferrer"><span class="thumb-fallback">暂无可验证店铺实拍<br>点击打开详情或地图核验</span></a><span class="thumb-label">餐饮信息待核验</span></div>`;
@@ -1186,15 +1258,12 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
       const featuredByPlan = {
         A: {
           0: { 3: ['哈儿土火锅南兴路店'] },
-          1: { 1: ['43号面摊'] },
-          2: { 3: ['武隆景区简餐/自带水'] },
-          3: { 1: ['九龙坡区联防食店家常菜'] }
+          2: { 3: ['仙女山碗碗羊肉（政协综合楼店）'] }
         },
         B: {
           0: { 3: ['哈儿土火锅南兴路店'] },
           1: { 1: ['九龙坡区联防食店家常菜', '胡记蹄花汤'] },
-          3: { 3: ['武隆景区简餐/自带水'] },
-          4: { 1: ['43号面摊'] }
+          3: { 3: ['仙女山碗碗羊肉（政协综合楼店）'] }
         }
       };
 
@@ -1250,28 +1319,64 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
         return [title, text, mapLinks(title, key).amap, '交通', key];
       }
 
+      function namedFoods(names) {
+        return names.map(name => findFood(name)).filter(Boolean);
+      }
+
       function foodItemsForDay(title, slotIndex) {
-        if (title.includes('机场日') || title.includes('返程')) return [];
-        if (title.includes('武隆')) {
-          return [
-            ['武隆景区简餐/自带水', '只把午餐当补给，不为餐厅折返；天生三桥和地缝日优先保证游玩时间。', links.wulong, '景区'],
-            ['武隆碗碗羊肉/乌江鱼', '若返程较早且不赶时间，可在武隆城区补一顿地方菜；不作为固定要求。', 'https://www.amap.com/search?query=%E6%AD%A6%E9%9A%86%20%E7%A2%97%E7%A2%97%E7%BE%8A%E8%82%89%20%E4%B9%8C%E6%B1%9F%E9%B1%BC&city=%E9%87%8D%E5%BA%86%E5%B8%82', '地方菜']
-          ];
+        if (title.includes('机场日') || title.includes('返程')) {
+          if (slotIndex === 0) return namedFoods(['星巴克（重庆机场T3值机大厅店）', '肯德基（机场T3A餐厅）']);
+          if (slotIndex === 1) return namedFoods(['肯德基（机场T3A餐厅）']);
+          return namedFoods(['星巴克（重庆机场T3值机大厅店）']);
         }
-        if (title.includes('抵达南坪')) return flatten(['south'], foods).slice(slotIndex === 3 ? 1 : 0, 6);
-        if (title.includes('同学汇合')) return flatten(['south'], foods).slice(slotIndex === 3 ? 1 : 0, 6);
-        if (title.includes('老重庆') || title.includes('杨家坪') || title.includes('黄桷坪')) return flatten(['old'], foods).slice(slotIndex === 1 ? 1 : 0, 4);
-        if (title.includes('礼嘉') || title.includes('南坪') || title.includes('南岸')) return flatten(['south'], foods).slice(0, 4);
+        if (title.includes('南山自驾')) {
+          if (slotIndex === 0) return namedFoods(['李师傅牛肉面（重庆南坪步行街店）']);
+          if (slotIndex === 1) return namedFoods(['老君洞道观-斋堂', '先机泉水鸡汤（南山老君洞店）']);
+          if (slotIndex === 2) return namedFoods(['南山植物园游客服务点']);
+          return namedFoods(['周恭恭拌面·重庆小面（南坪店）']);
+        }
+        if (title.includes('武隆')) {
+          if (slotIndex === 0) return namedFoods(['7小面（南坪总店）']);
+          if (slotIndex === 1) return namedFoods(['仙女山碗碗羊肉（政协综合楼店）']);
+          if (slotIndex === 2) return namedFoods(['仙女山碗碗羊肉（政协综合楼店）']);
+          return namedFoods(['周恭恭拌面·重庆小面（南坪店）']);
+        }
+        if (title.includes('解放碑') || title.includes('渝中') || title.includes('十八梯')) {
+          if (slotIndex === 0) return namedFoods(['渝口福重庆小面（解放碑步行街店）']);
+          if (slotIndex === 1) return namedFoods(['杨记隆府']);
+          if (slotIndex === 2) return namedFoods(['花市豌杂面（较场口店）']);
+          return namedFoods(['珮姐老火锅', '周师兄火锅', '杨记隆府']);
+        }
+        if (title.includes('老重庆') || title.includes('杨家坪') || title.includes('黄桷坪')) {
+          if (slotIndex === 0) return namedFoods(['歪哥战友牛肉面']);
+          if (slotIndex === 1) return namedFoods(['九龙坡区联防食店家常菜', '胡记蹄花汤']);
+          if (slotIndex === 2) return namedFoods(['交通茶馆（始于1987年）']);
+          return namedFoods(['印象渝都杨家坪店', '陶婆婆火锅', '懒厨鱼府']);
+        }
+        if (title.includes('抵达南坪')) {
+          if (slotIndex === 0) return namedFoods(['李师傅牛肉面（重庆南坪步行街店）']);
+          if (slotIndex === 1) return namedFoods(['43号面摊']);
+          if (slotIndex === 2) return namedFoods(['7小面（南坪总店）']);
+          return namedFoods(['哈儿土火锅南兴路店', '八嬢家常菜（南坪店）', '李子坝梁山鸡（南坪店）']);
+        }
+        if (title.includes('南岸')) {
+          if (slotIndex === 0) return namedFoods(['李师傅牛肉面（重庆南坪步行街店）']);
+          if (slotIndex === 1) return namedFoods(['八嬢家常菜（南坪店）']);
+          if (slotIndex === 2) return namedFoods(['7小面（南坪总店）']);
+          return namedFoods(['43号面摊', '神伙烧烤（南坪总店）']);
+        }
         if (title.includes('换江北嘴') || title.includes('夜景') || title.includes('朝天门')) return flatten(['riverside', 'center'], foods).slice(0, 4);
-        return flatten(['center', 'riverside'], foods).slice(0, 4);
+        return [];
       }
 
       function sceneItemsForDay(title) {
         if (title.includes('机场日') || title.includes('返程')) return [];
-        if (title.includes('武隆')) return scenes.nature;
-        if (title.includes('老重庆') || title.includes('杨家坪') || title.includes('黄桷坪')) return scenes.old;
-        if (title.includes('南坪') || title.includes('礼嘉') || title.includes('南岸')) return scenes.south;
-        if (title.includes('夜景') || title.includes('江北嘴') || title.includes('朝天门')) return [...scenes.core, ...scenes.south].slice(0, 4);
+        if (title.includes('武隆')) return scenes.nature.slice(0, 2);
+        if (title.includes('老重庆') || title.includes('杨家坪') || title.includes('黄桷坪')) return scenes.old.slice(0, 3);
+        if (title.includes('南山自驾')) return scenes.south.slice(3);
+        if (title.includes('抵达南坪')) return scenes.south.slice(0, 2);
+        if (title.includes('南岸')) return scenes.south.slice(0, 3);
+        if (title.includes('夜景') || title.includes('江北嘴') || title.includes('朝天门')) return scenes.core;
         return scenes.core;
       }
 
@@ -1281,7 +1386,7 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
       }
 
       function foodCardsOnly(items) {
-        return items.filter(item => item && imageByName[item[0]] && !['交通', '景区'].includes(item[3]));
+        return items.filter(item => item && !['交通'].includes(item[3]));
       }
 
       function detailCard(item) {
@@ -1300,37 +1405,53 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
         </article>`;
       }
 
-      function slotItems(planKey, dayIndex, slotIndex, title) {
+      function slotFoodItems(planKey, dayIndex, slotIndex, title) {
         const items = [];
-        if (title.includes('机场日') || title.includes('返程')) {
-          if (slotIndex === 0) {
-            addUnique(items, stayItems(planKey, dayIndex, 'morning'));
-            addUnique(items, [transportItem('南坪亚朵 → 江北机场 T3', '07:00-07:15 打车出发，目标 08:00 前后到达机场；不安排市内景点或额外早餐店。', 'airport')]);
-          }
-          return items.slice(0, 5);
-        }
-        if (slotIndex === 0) {
-          addUnique(items, stayItems(planKey, dayIndex, 'morning'));
-          if (title.includes('武隆')) {
-            addUnique(items, [
-              transportItem('重庆东站 → 武隆南', '优先购买早班动车/高铁；从 base 打车去重庆东站，武隆南再接景区交通。', 'east'),
-              ...foodCardsOnly(foodItemsForDay(title, 0)).slice(0, 1)
-            ]);
-          } else {
-            addUnique(items, foodCardsOnly(foodItemsForDay(title, 0).filter(item => item[3] === '小面' || item[3] === '指定').slice(0, 2)));
-          }
-        } else if (slotIndex === 1) {
-          addUnique(items, foodCardsOnly(foodItemsForDay(title, 1)).slice(0, 3));
-          addUnique(items, featuredItems(planKey, dayIndex, slotIndex));
-        } else if (slotIndex === 2) {
-          addUnique(items, sceneItemsForDay(title).slice(0, 4));
-          if (title.includes('武隆')) addUnique(items, [transportItem('武隆南 → 仙女山游客中心', '优先景区接驳或打车，现场以官方当日接驳为准。', 'wulong')]);
-        } else {
-          addUnique(items, foodCardsOnly(foodItemsForDay(title, 3)).slice(0, 3));
-          addUnique(items, featuredItems(planKey, dayIndex, slotIndex));
-          addUnique(items, stayItems(planKey, dayIndex, 'evening').slice(0, 2));
-        }
+        addUnique(items, foodCardsOnly(foodItemsForDay(title, slotIndex)));
+        addUnique(items, featuredItems(planKey, dayIndex, slotIndex));
         return items.slice(0, 5);
+      }
+
+      function sceneItemsForSlot(title, slotIndex) {
+        if (title.includes('机场日') || title.includes('返程')) {
+          if (slotIndex === 0) return scenes.airport.slice(0, 1);
+          if (slotIndex === 1) return scenes.airport.slice(0, 2);
+          return scenes.airport.slice(2);
+        }
+        if (title.includes('武隆')) return slotIndex === 0 ? scenes.nature.slice(0, 1) : scenes.nature.slice(0, 2);
+        if (title.includes('南山自驾')) {
+          const nanshanScenes = scenes.south.slice(3);
+          if (slotIndex === 0) return nanshanScenes.slice(0, 1);
+          if (slotIndex === 1) return nanshanScenes.slice(1, 2);
+          if (slotIndex === 2) return nanshanScenes.slice(1, 3);
+          return nanshanScenes.slice(0, 2);
+        }
+        if (title.includes('老重庆') || title.includes('杨家坪') || title.includes('黄桷坪')) {
+          if (slotIndex === 0) return scenes.old.slice(0, 1);
+          if (slotIndex === 1) return scenes.old.slice(1, 2);
+          if (slotIndex === 2) return scenes.old.slice(1, 3);
+          return scenes.old.slice(2, 4);
+        }
+        if (title.includes('抵达南坪')) {
+          if (slotIndex === 0) return scenes.arrival;
+          if (slotIndex === 1) return scenes.arrival.slice(0, 1);
+          if (slotIndex === 2) return scenes.south.slice(0, 2);
+          return scenes.south.slice(1, 2);
+        }
+        if (title.includes('南岸')) {
+          if (slotIndex === 0) return scenes.south.slice(0, 1);
+          if (slotIndex === 1) return scenes.south.slice(0, 2);
+          if (slotIndex === 2) return scenes.south.slice(1, 3);
+          return scenes.south.slice(1, 3);
+        }
+        if (title.includes('解放碑') || title.includes('渝中') || title.includes('十八梯')) {
+          if (slotIndex === 0) return scenes.core.slice(0, 2);
+          if (slotIndex === 1) return scenes.core.slice(0, 2);
+          if (slotIndex === 2) return scenes.core;
+          if (slotIndex === 3) return scenes.core.slice(2);
+          return [];
+        }
+        return sceneItemsForDay(title);
       }
 
       function mapLinks(name, key) {
@@ -1356,14 +1477,47 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
       const slotWindows = ['07:25-11:30', '11:30-13:30', '13:30-18:00', '18:00-22:00'];
       const slotLabels = ['上午', '中午', '下午', '晚上'];
 
+      function slotWindowsFor(day) {
+        const title = day[1];
+        if (title.includes('南山自驾')) return ['08:30-11:00', '11:00-13:30', '13:30-18:00', '18:00-21:00'];
+        if (title.includes('武隆')) {
+          return activePlan === 'B'
+            ? ['05:45-11:30', '11:30-13:30', '13:30-18:00', '18:00-23:00']
+            : ['06:45-11:30', '11:30-13:30', '13:30-18:00', '18:00-23:00'];
+        }
+        if (title.includes('机场日') || title.includes('返程')) return ['06:00-07:00', '07:00-08:00', '08:00-10:50', '10:50 后'];
+        if (title.includes('抵达')) return ['07:25-11:30', '11:30-13:30', '14:30-18:00', '18:30-21:00'];
+        if (title.includes('南岸')) return ['08:00-12:00', '12:00-13:30', '13:30-18:00', '18:30-21:30'];
+        if (title.includes('老重庆')) return ['09:00-12:00', '12:00-13:30', '14:00-17:30', '18:30-21:30'];
+        if (title.includes('解放碑') || title.includes('渝中')) return ['09:30-12:00', '12:00-13:30', '14:00-17:30', '18:30-21:00'];
+        return slotWindows;
+      }
+
       function routeForSlot(day, slotIndex) {
         const route = (day[2] || []).filter(key => points[key]);
         if (!route.length) return [];
         if (day[1].includes('武隆')) {
+          if (route.length === 3 && route[1] === 'wulong') {
+            if (slotIndex === 0) return route.slice(0, 2);
+            if (slotIndex === 1 || slotIndex === 2) return route.slice(1, 2);
+            return route.slice(1, 3);
+          }
           if (slotIndex === 0) return [...new Set(route.slice(0, 3))];
           if (slotIndex === 1) return [...new Set(route.slice(2, 3))];
           if (slotIndex === 2) return [...new Set(route.slice(2, 3))];
           return [...new Set(route.slice(-2))];
+        }
+        if (day[1].includes('南山自驾')) {
+          if (slotIndex === 0) return route.slice(0, 2);
+          if (slotIndex === 1) return route.slice(1, 3);
+          if (slotIndex === 2) return route.slice(2, 4);
+          return route.slice(-2);
+        }
+        if (day[1].includes('解放碑') || day[1].includes('渝中')) {
+          if (slotIndex === 0) return route.slice(0, 2);
+          if (slotIndex === 1) return route.slice(1, 3);
+          if (slotIndex === 2) return route.slice(2, 5);
+          return route.slice(-2);
         }
         if (slotIndex === 0) return [...new Set(route.slice(0, 2))];
         if (slotIndex === 1) return [...new Set(route.slice(1, 3))];
@@ -1383,9 +1537,19 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
           return '返程缓冲，不安排新增景点。';
         }
         if (title.includes('武隆')) {
+          if (activePlan === 'B') {
+            if (slotIndex === 0) return '南坪取车 → 武隆景区：自驾约 2.5-3 小时，预留停车与景区接驳。';
+            if (slotIndex === 1 || slotIndex === 2) return '租车停放后以景区接驳或短途步行完成天生三桥、龙水峡地缝。';
+            return '武隆 → 南坪：按返程车况和驾驶疲劳安排，先回酒店，不追加夜景。';
+          }
           if (slotIndex === 0) return '住宿区打车 → 重庆东站 → 武隆南；优先早班动车/高铁。';
           if (slotIndex === 1 || slotIndex === 2) return '武隆南/游客中心之间以景区接驳或短途打车为主。';
           return '武隆南 → 重庆东站 → 住宿区；返程较晚时直接打车回酒店。';
+        }
+        if (title.includes('南山自驾')) {
+          if (slotIndex === 0) return activePlan === 'B' ? '沿用前一日租车，从南坪出发前往南山。' : '南坪取车后前往南山，先确认停车与山路天气。';
+          if (slotIndex === 1 || slotIndex === 2) return '租车串联南山主线和一个顺路观景点，按停车与拥堵提前回程。';
+          return '南山 → 租车点/南坪：18:00 后还车或停回指定地点，目标 20:00-21:00 回酒店。';
         }
         if (title.includes('换住')) {
           if (slotIndex === 0) return '前段酒店退房、寄存行李；轨道交通或打车换到后段 base。';
@@ -1399,6 +1563,7 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
 
       function renderSlotDetail(day, slotIndex) {
         const slot = day[3][slotIndex];
+        const windows = slotWindowsFor(day);
         const route = routeNames(day, slotIndex);
         const stayContext = stayContextForSlot(activePlan, activeDay, slotIndex);
         const moveHint = day[1].includes('换住')
@@ -1409,7 +1574,7 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
         root.querySelector('#slot-detail').innerHTML = `
           <div class="section-title">
             <h3>${day[0]} · ${slot[0]} · ${slot[1]}</h3>
-            <small>${slotWindows[slotIndex]}</small>
+            <small>${windows[slotIndex]}</small>
           </div>
           <p>${slot[2]}</p>
           <div class="slot-detail-grid">
@@ -1422,17 +1587,24 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
 
       function renderSlotOptions(planKey, dayIndex, slotIndex, day) {
         const slot = day[3][slotIndex];
-        const items = slotItems(planKey, dayIndex, slotIndex, day[1]);
-        root.querySelector('#slot-options-caption').textContent = `${day[0]} · ${slot[0]} · ${slot[1]}`;
+        const windows = slotWindowsFor(day);
+        const items = optionMode === 'scene'
+          ? sceneItemsForSlot(day[1], slotIndex)
+          : slotFoodItems(planKey, dayIndex, slotIndex, day[1]);
+        const modeLabel = optionMode === 'scene' ? '景点 / 打卡点' : '餐饮备选';
+        root.querySelector('#slot-options-caption').textContent = `${day[0]} · ${slot[0]} · ${modeLabel}`;
+        root.querySelectorAll('.option-tab').forEach(button => {
+          button.setAttribute('aria-selected', String(button.dataset.optionMode === optionMode));
+        });
         root.querySelector('#slot-options').innerHTML = `
           <section class="day-detail">
             <div class="day-detail-head">
-              <b>${slot[0]} · ${slot[1]}</b>
-              <small>${slotWindows[slotIndex]}</small>
+              <b>${modeLabel} · ${slot[1]}</b>
+              <small>${windows[slotIndex]}</small>
             </div>
             <div class="day-detail-body">
               <p class="day-detail-copy">${slot[2]}</p>
-              <div class="cards">${items.map(detailCard).join('')}</div>
+              ${items.length ? `<div class="cards">${items.map(detailCard).join('')}</div>` : `<p class="day-detail-copy">本时段以行程执行为主，暂不新增独立卡片；请按左侧的时间、路线和备选规则执行。</p>`}
             </div>
           </section>`;
       }
@@ -1558,6 +1730,13 @@ body { margin:0; padding:24px; background: radial-gradient(circle at top left, r
           activeSlot = 0;
           root.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t === tab)));
           renderPlan();
+        });
+      });
+
+      root.querySelectorAll('.option-tab').forEach(button => {
+        button.addEventListener('click', () => {
+          optionMode = button.dataset.optionMode;
+          renderSlotOptions(activePlan, activeDay, activeSlot, plans[activePlan].days[activeDay]);
         });
       });
 
